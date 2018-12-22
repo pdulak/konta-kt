@@ -16,3 +16,6 @@ class Account(models.Model):
     def __str__(self):
         return self.account_name
 
+    def has_account_number(self):
+        return self.account_number != ''
+
