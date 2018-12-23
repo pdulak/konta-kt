@@ -9,8 +9,10 @@ from django.http import HttpResponse
 
 def index(request):
     latest_accounts_list = Account.objects.order_by('-id')[:5]
+    all_banks_list = Bank.objects.order_by('id')
     context = {
         'latest_accounts_list': latest_accounts_list,
+        'all_banks_list': all_banks_list,
     }
     return render(request, 'accounts/index.html', context)
 

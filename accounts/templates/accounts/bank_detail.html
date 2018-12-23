@@ -1,1 +1,7 @@
-{{ bank }}
+<h1>{{ bank.bank_name }}</h1>
+
+<ul>
+    {% for account in bank.account_set.all %}
+        <li>{{ account.account_name }}</li>
+    {% endfor %}
+</ul>
