@@ -11,7 +11,7 @@ class Bank(models.Model):
 class Account(models.Model):
     bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
     account_name = models.CharField(max_length=200)
-    account_number = models.CharField(max_length=200)
+    account_number = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return self.account_name

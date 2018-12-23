@@ -1,8 +1,27 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.http import Http404
+
+from .models import Account, Bank
 
 # Create your views here.
 
 from django.http import HttpResponse
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the accounts index.")
+    latest_accounts_list = Account.objects.order_by('-id')[:5]
+    context = {
+        'latest_accounts_list': latest_accounts_list,
+    }
+    return render(request, 'accounts/index.html', context)
+
+def account_detail(request, account_id):
+    try:
+        account = Account.objects.get(pk=account_id)
+    except Account.DoesNotExist:
+        raise Http404("Account does not exist")
+    return render(request, 'accounts/account_detail.html', {'account': account})
+
+def bank_detail(request, bank_id):
+    bank = get_object_or_404(Bank, pk=bank_id)
+    return render(request, 'accounts/bank_detail.html', {'bank': bank})
+
