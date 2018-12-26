@@ -1,7 +1,7 @@
-<h1>{{ bank.bank_name }}</h1>
+<h1>{{ bank.name }}</h1>
 
 <ul>
     {% for account in bank.account_set.all %}
-        <li>{{ account.account_name }}</li>
+        <li>{{ account.name }}</li>
     {% endfor %}
 </ul>

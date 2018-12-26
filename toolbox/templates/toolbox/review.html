@@ -1,0 +1,78 @@
+<h2>Currencies</h2>
+{% if all_currencies_list %}
+    <ul>
+    {% for currency in all_currencies_list %}
+        <li>{{ currency.name }} {{ currency.abbr }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No currencies are available.</p>
+{% endif %}
+
+<h2>Banks</h2>
+{% if all_banks_list %}
+    <ul>
+    {% for bank in all_banks_list %}
+        <li><a href="{% url 'accounts:bank_detail' bank.id %}">{{ bank.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No banks are available.</p>
+{% endif %}
+
+<h2>Latest accounts</h2>
+{% if latest_accounts_list %}
+    <ul>
+    {% for account in latest_accounts_list %}
+        <li><a href="{% url 'accounts:account_detail' account.id %}">{{ account.name }}</a> ({{ account.id }}; {{ account.number }})</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No accounts are available.</p>
+{% endif %}
+
+<hr>
+
+<h2>Category Groups</h2>
+{% if all_categoryGroups_list %}
+    <ul>
+    {% for element in all_categoryGroups_list %}
+        <li>{{ element.name }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Category Groups are available.</p>
+{% endif %}
+
+<h2>Categories</h2>
+{% if all_categories_list %}
+    <ul>
+    {% for element in all_categories_list %}
+        <li>{{ element.name }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Categories are available.</p>
+{% endif %}
+
+<h2>Transaction Types</h2>
+{% if all_transactionTypes_list %}
+    <ul>
+    {% for element in all_transactionTypes_list %}
+        <li>{{ element.name }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Transaction Types are available.</p>
+{% endif %}
+
+<h2>Transactions</h2>
+{% if all_transactions_list %}
+    <ul>
+    {% for element in all_transactions_list %}
+        <li>{{ element.description }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Transactions are available.</p>
+{% endif %}

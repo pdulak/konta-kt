@@ -2,7 +2,7 @@
 {% if all_banks_list %}
     <ul>
     {% for bank in all_banks_list %}
-        <li><a href="{% url 'accounts:bank_detail' bank.id %}">{{ bank.bank_name }}</a></li>
+        <li><a href="{% url 'accounts:bank_detail' bank.id %}">{{ bank.name }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
@@ -13,7 +13,7 @@
 {% if latest_accounts_list %}
     <ul>
     {% for account in latest_accounts_list %}
-        <li><a href="{% url 'accounts:account_detail' account.id %}">{{ account.account_name }}</a> ({{ account.id }}; {{ account.account_number }})</li>
+        <li><a href="{% url 'accounts:account_detail' account.id %}">{{ account.name }}</a> ({{ account.id }}; {{ account.number }})</li>
     {% endfor %}
     </ul>
 {% else %}
