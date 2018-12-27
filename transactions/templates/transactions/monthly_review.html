@@ -1,0 +1,10 @@
+<h2>Transactions monthly review</h2>
+{% if months_list %}
+    <ul>
+    {% for month in months_list %}
+        <li>{{ month.month }}: {{ month.total }}; UP: {{ month.up }}; DOWN: {{ month.down }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No transactions are available.</p>
+{% endif %}
