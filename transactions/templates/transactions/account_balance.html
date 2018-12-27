@@ -1,0 +1,15 @@
+<h2>Accounts balance</h2>
+
+{% if accounts_list %}
+    <ul>
+    {% for account in accounts_list %}
+        <li>{{ account.account__bank__name }} - {{ account.account__name }}:
+            <strong>{{ account.total|floatformat:2 }}</strong>;
+            UP: <strong>{{ account.up|floatformat:2 }}</strong>;
+            DOWN: <strong>{{ account.down|floatformat:2 }}</strong>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No transactions are available.</p>
+{% endif %}
