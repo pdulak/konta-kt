@@ -35,6 +35,9 @@ class Transaction(models.Model):
     added = models.DateField()
     amount = models.DecimalField(max_digits=14, decimal_places=2)
     balance = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    amount_account_currency = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    balance_account_currency = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    currency_multiplier = models.DecimalField(max_digits=14, decimal_places=4, default=0)
     description = models.CharField(max_length=2000, blank=True, null=True)
     imported_description = models.CharField(max_length=2000, blank=True, null=True)
     type = models.CharField(max_length=2000, blank=True, null=True)
@@ -43,4 +46,4 @@ class Transaction(models.Model):
     irrelevant = models.BooleanField(default=False, blank=True, null=True)
 
     def __str__(self):
-        return self.description + '; ' + self.imported_description + '; ' + str(self.date) + '; ' + str(self.amount)
+        return self.description + '; ' + self.imported_description + '; ' + str(self.date) + '; ' + str(self.amount) + ' PLN; ' + str(self.amount_account_currency) + ' ' + str(self.account.currency.name)

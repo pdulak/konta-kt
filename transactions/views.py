@@ -33,9 +33,9 @@ def account_balance(request):
         .select_related('currency') \
         .values('account', 'account__name', 'account__bank__name', 'account__currency__name') \
         .annotate(
-            total=Sum('amount'),
-            down=Sum('amount', filter=Q(amount__lt=0)),
-            up=Sum('amount', filter=Q(amount__gt=0)),
+            total=Sum('amount_account_currency'),
+            down=Sum('amount_account_currency', filter=Q(amount_account_currency__lt=0)),
+            up=Sum('amount_account_currency', filter=Q(amount_account_currency__gt=0)),
         ) \
         .annotate(
             ttotal=Cast('total', DecimalField(max_digits=14, decimal_places=2)),
