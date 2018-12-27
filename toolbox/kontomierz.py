@@ -70,7 +70,7 @@ def do_initial_load(df):
                                                                       imported_description=row['Tytul'],
                                                                       type=row['Rodzaj'], party_name=row['Strona'],
                                                                       party_IBAN=row['IBANStrony'],
-                                                                      irrelevant=(True if row['Nieistotna'] else False)
+                                                                      irrelevant=(True if row['Nieistotna'] == 'nieistotna' else False)
                                                                       )
 
     return True
