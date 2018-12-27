@@ -30,16 +30,17 @@ class TransactionType(models.Model):
 class Transaction(models.Model):
     account = models.ForeignKey('accounts.Account', on_delete=models.PROTECT)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
-    uuid_text = models.CharField(max_length=200)
+    uuid_text = models.CharField(max_length=200, blank=True, null=True)
     date = models.DateField()
     added = models.DateField()
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    description = models.CharField(max_length=2000)
-    imported_description = models.CharField(max_length=2000)
-    type = models.CharField(max_length=2000)
-    party_name = models.CharField(max_length=500)
-    party_IBAN = models.CharField(max_length=200)
-    irrelevant = models.BooleanField(default=False)
+    amount = models.DecimalField(max_digits=14, decimal_places=2)
+    balance = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    description = models.CharField(max_length=2000, blank=True, null=True)
+    imported_description = models.CharField(max_length=2000, blank=True, null=True)
+    type = models.CharField(max_length=2000, blank=True, null=True)
+    party_name = models.CharField(max_length=500, blank=True, null=True)
+    party_IBAN = models.CharField(max_length=200, blank=True, null=True)
+    irrelevant = models.BooleanField(default=False, blank=True, null=True)
 
     def __str__(self):
-        return self.description + '; ' + self.date + '; ' + self.amount
+        return self.description + '; ' + self.imported_description + '; ' + str(self.date) + '; ' + str(self.amount)

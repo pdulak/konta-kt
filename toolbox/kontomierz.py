@@ -46,30 +46,31 @@ def load_csv():
 
 
 def do_initial_load(df):
-    already_inserted = []
-
-    # print('Inserting Bank values')
-    # for val, cnt in df['Bank'].value_counts().iteritems():
-    #     if val not in already_inserted:
-    #         obj, created = Bank.objects.get_or_create(
-    #             name=val,
-    #             defaults={},
-    #         )
-    #         already_inserted.append(val)
-
-    already_inserted = []
-    print('Inserting Kategoria values')
-    for val, cnt in df['Kategoria'].value_counts().iteritems():
-        if val not in already_inserted:
-            obj, created = Category.objects.get_or_create(
-                name=val,
-                defaults={},
-            )
-            already_inserted.append(val)
+    df['Kategoria'] = df['Kategoria'].fillna('Brak kategorii')
 
     acc_bank = df.groupby(['Bank', 'Nazwa konta']).size().reset_index(name="Count")
     for index, row in acc_bank.iterrows():
         this_bank, created = Bank.objects.get_or_create(name=row['Bank'])
         this_account, created = Account.objects.get_or_create(bank=this_bank, name=row['Nazwa konta'])
+
+    for index, row in df.iterrows():
+        this_bank, created = Bank.objects.get_or_create(name=row['Bank'])
+        this_account, created = Account.objects.get_or_create(bank=this_bank, name=row['Nazwa konta'])
+        this_cat, created = Category.objects.get_or_create(name=row['Kategoria'])
+        dateParts = row['DataTransakcji'].split('-')
+        data_transakcji = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0]
+        dateParts = row['DataKsiegowania'].split('-')
+        data_ksiegowania = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0]
+        this_transaction, created = Transaction.objects.get_or_create(account=this_account, category=this_cat,
+                                                                      uuid_text=row['UID'], date=data_transakcji,
+                                                                      added=data_ksiegowania,
+                                                                      amount=row['Kwota'].replace(',','.'),
+                                                                      balance=row['Saldo'].replace(',','.'),
+                                                                      description=row['Opis'],
+                                                                      imported_description=row['Tytul'],
+                                                                      type=row['Rodzaj'], party_name=row['Strona'],
+                                                                      party_IBAN=row['IBANStrony'],
+                                                                      irrelevant=(True if row['Nieistotna'] else False)
+                                                                      )
 
     return True

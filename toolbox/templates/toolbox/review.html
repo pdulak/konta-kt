@@ -70,7 +70,7 @@
 {% if all_transactions_list %}
     <ul>
     {% for element in all_transactions_list %}
-        <li>{{ element.description }}</li>
+        <li>{{ element.date }}; {{ element.amount }}; {{ element.description }}; {{ element.imported_description }}; </li>
     {% endfor %}
     </ul>
 {% else %}

@@ -28,7 +28,7 @@ def review_database(request):
     all_categoryGroups_list = CategoryGroup.objects.order_by('id')
     all_categories_list = Category.objects.order_by('id')
     all_transactionTypes_list = TransactionType.objects.order_by('id')
-    all_transactions_list = Transaction.objects.order_by('id')
+    all_transactions_list = Transaction.objects.order_by('-date')
 
     context = {
         'latest_accounts_list': latest_accounts_list,
@@ -43,23 +43,18 @@ def review_database(request):
 
 
 def load_kontomierz(request):
-    df = kontomierz.load_csv()
-    print(df.head())
-
-    # print('Saving df to: ', hdf_file)
-    # hdf_dir = os.path.join(settings.BASE_DIR, 'temp')
-    # hdf_file = os.path.join(hdf_dir, 'kontomierz.h5')
-    # df.to_hdf(hdf_file, 'data')
-
-    # remove already insterted data
-    Account.objects.all().delete()
-    Bank.objects.all().delete()
-    Transaction.objects.all().delete()
-    TransactionType.objects.all().delete()
-    Category.objects.all().delete()
-    CategoryGroup.objects.all().delete()
-
-    # import base data
-    kontomierz.do_initial_load(df)
+    # df = kontomierz.load_csv()
+    # print(df.head())
+    #
+    # # remove already insterted data
+    # Transaction.objects.all().delete()
+    # TransactionType.objects.all().delete()
+    # Category.objects.all().delete()
+    # CategoryGroup.objects.all().delete()
+    # Account.objects.all().delete()
+    # Bank.objects.all().delete()
+    #
+    # # import base data
+    # kontomierz.do_initial_load(df)
 
     return HttpResponse("Loading CSV;")
