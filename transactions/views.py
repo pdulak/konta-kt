@@ -30,7 +30,8 @@ def account_balance(request):
     accounts_list = Transaction.objects \
         .select_related('account') \
         .select_related('bank') \
-        .values('account', 'account__name', 'account__bank__name') \
+        .select_related('currency') \
+        .values('account', 'account__name', 'account__bank__name', 'account__currency__name') \
         .annotate(
             total=Sum('amount'),
             down=Sum('amount', filter=Q(amount__lt=0)),

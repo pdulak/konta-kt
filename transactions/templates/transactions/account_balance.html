@@ -3,7 +3,7 @@
 {% if accounts_list %}
     <ul>
     {% for account in accounts_list %}
-        <li>{{ account.account__bank__name }} - {{ account.account__name }}:
+        <li>{{ account.account__bank__name }} - {{ account.account__name }} -  {{ account.account__currency__name }}:
             <strong>{{ account.total|floatformat:2 }}</strong>;
             UP: <strong>{{ account.up|floatformat:2 }}</strong>;
             DOWN: <strong>{{ account.down|floatformat:2 }}</strong>
