@@ -1,6 +1,7 @@
 import os
 
 from . import kontomierz
+from . import mbank
 
 from django.conf import settings
 from django.shortcuts import render
@@ -50,4 +51,10 @@ def load_kontomierz(request):
     # # import base data
     # kontomierz.do_initial_load(df)
 
-    return HttpResponse("Loading CSV;")
+    return HttpResponse("Loading kontomierz CSV;")
+
+
+def load_mbank(request):
+    mbank.load_csv()
+
+    return HttpResponse("Loading mBank CSV;")
