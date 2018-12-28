@@ -26,7 +26,7 @@ class Account(models.Model):
     number = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.bank.name + '; ' + self.number + '; ' + self.name
 
     def has_account_number(self):
         return self.number != ''

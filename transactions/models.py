@@ -1,4 +1,5 @@
 from django.db import models
+from toolbox.models import ImportHeader
 
 
 class CategoryGroup(models.Model):
@@ -30,6 +31,7 @@ class TransactionType(models.Model):
 class Transaction(models.Model):
     account = models.ForeignKey('accounts.Account', on_delete=models.PROTECT)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
+    import_header = models.ForeignKey(ImportHeader, on_delete=models.PROTECT, blank=True, null=True)
     uuid_text = models.CharField(max_length=200, blank=True, null=True)
     date = models.DateField()
     added = models.DateField()
