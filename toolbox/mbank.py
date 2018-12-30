@@ -2,11 +2,13 @@ import os
 import re
 import glob
 import pandas as pd
+import datetime
 
 from django.conf import settings
 
-from accounts.models import Account, Bank, Currency
-from transactions.models import CategoryGroup, Category, TransactionType, Transaction
+from .models import ImportHeader
+from accounts.models import Account
+from transactions.models import TransactionType, Transaction, TransactionImportTemp
 
 description_split_text = 'DATA TRANSAKCJI:'
 
@@ -62,9 +64,9 @@ def load_csv():
 
         df_temp = pd.read_csv(pd.compat.StringIO(this_data), sep=';', comment='#', engine='python', names=field_names,
                               quotechar='|', encoding='cp1250')
-        df_temp['Account Number'] = this_account_number
 
-        # get date from description
+        df_temp['Account Number'] = this_account_number
+        df_temp['Source'] = os.path.basename(this_file)
         df_temp['Description'] = df_temp['Description'].fillna('')
         df_temp['Party IBAN'] = df_temp['Party IBAN'].fillna('')
         df_temp['Date Modified'] = df_temp['Description'].map(extract_date_from_description)
@@ -84,3 +86,58 @@ def load_csv():
     # print(df.sample(10))
 
     return df
+
+
+def do_import(df):
+    print('--------------------------------------------------------')
+    numbered_accounts = Account.objects.exclude(number__isnull=True).exclude(number__exact='')
+    accounts_numbers = {}
+    import_headers = {}
+    last_source = ''
+    last_account = ''
+
+    if numbered_accounts.count() > 0:
+        # prepare dictionary of account numbers
+        for a in numbered_accounts:
+            accounts_numbers[a.number.replace(' ', '')] = a
+
+        # do import
+        for index, row in df.iterrows():
+            if row['Account Number'] in accounts_numbers:
+                if row['Source'] not in import_headers:
+                    import_headers[row['Source']] = ImportHeader.objects.create(
+                        source=row['Source'], date=datetime.datetime.now())
+
+                if (last_source != row['Source']) | (last_account != row['Account Number']):
+                    last_source = row['Source']
+                    last_account = row['Account Number']
+                    print(datetime.datetime.now(), ' importing ', last_account, '; ', last_source)
+
+                this_transaction, created = TransactionImportTemp.objects.get_or_create(
+                    account=accounts_numbers[row['Account Number']],
+                    import_header=import_headers[row['Source']],
+                    uuid_text=row['Date Modified']+"__"+str(row['Amount Modified']),
+                    date=row['Date Modified'],
+                    added=row['Added'],
+                    amount=row['Amount Modified'],
+                    balance=row['Balance Modified'],
+                    amount_account_currency=row['Amount Modified'],
+                    balance_account_currency=row['Balance Modified'],
+                    currency_multiplier=1,
+                    imported_description=row['Description'],
+                    type=row['Type'],
+                    party_name=row['Party Name'],
+                    party_IBAN=row['Party IBAN']
+                )
+            else:
+                print("Account number ", row['Account Number'], " not found")
+
+        # copy from temp to main table
+
+    else:
+        print('Accounts with numbers not found')
+
+    print('--------------------------------------------------------')
+    print(datetime.datetime.now(), ' import finished')
+
+    return True

@@ -55,6 +55,8 @@ def load_kontomierz(request):
 
 
 def load_mbank(request):
-    mbank.load_csv()
+    df = mbank.load_csv()
+
+    mbank.do_import(df)
 
     return HttpResponse("Loading mBank CSV;")
