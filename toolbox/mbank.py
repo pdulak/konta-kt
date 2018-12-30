@@ -8,11 +8,30 @@ from django.conf import settings
 from accounts.models import Account, Bank, Currency
 from transactions.models import CategoryGroup, Category, TransactionType, Transaction
 
+description_split_text = 'DATA TRANSAKCJI:'
+
+
+def extract_date_from_description(x):
+    parts = re.split(description_split_text, x)
+    if len(parts) > 1:
+        return parts[1].strip()
+
+    return None
+
+
+def trim_description(x):
+    parts = re.split(description_split_text, x)
+    if len(parts) > 1:
+        return parts[0].strip()
+
+    return x
+
 
 def load_csv():
     # load all csv files from temp dir
     sourceDir = os.path.join(settings.BASE_DIR, 'temp')
-    field_names = ['Date', 'Added', 'Type', 'Description', 'Party Name', 'Party IBAN', 'Amount', 'Balance']
+    field_names = ['Date', 'Added', 'Type', 'Description', 'Party Name', 'Party IBAN', 'Amount', 'Balance',
+                   'Account Number']
     df = pd.DataFrame()
 
     first_one = re.compile(r'^"')
@@ -32,36 +51,36 @@ def load_csv():
                 elif line[:14] == '#Data operacji':
                     save_transactions = True
                 elif save_account_number:
-                    this_account_number = line[:32]
+                    this_account_number = line[:32].replace(' ', '')
                     save_account_number = False
                 elif save_transactions:
                     if line[0] == '2':
-                        this_data += line
+                        this_data += line.replace("'", '"').replace('";"', "|;|").\
+                            replace('";', "|;").replace(';"', ";|")
                     else:
                         save_transactions = False
 
+        df_temp = pd.read_csv(pd.compat.StringIO(this_data), sep=';', comment='#', engine='python', names=field_names,
+                              quotechar='|', encoding='cp1250')
+        df_temp['Account Number'] = this_account_number
 
-                # temp_data = last_one.sub("|", line)
-                # temp_data = first_one.sub("|", temp_data)
-                # temp_data = temp_data.replace('";"', "|;|").replace('";', "|;").replace(';"', ";|")
-                # this_data += temp_data
+        # get date from description
+        df_temp['Description'] = df_temp['Description'].fillna('')
+        df_temp['Party IBAN'] = df_temp['Party IBAN'].fillna('')
+        df_temp['Date Modified'] = df_temp['Description'].map(extract_date_from_description)
+        df_temp['Description'] = df_temp['Description'].map(trim_description)
+        df_temp['Date Modified'] = df_temp['Date Modified'].fillna(df_temp['Date'])
+        df_temp['Amount Modified'] = df_temp['Amount'].map(
+            lambda x: float(re.sub('[^0-9\,\.-]','', x).replace(',', '.')))
+        df_temp['Balance Modified'] = df_temp['Balance'].map(
+            lambda x: float(re.sub('[^0-9\,\.-]', '', x).replace(',', '.')))
 
-        print('----------------------------------------')
-        print(this_data)
-        print('----------------------------------------')
-        print(this_account_number)
-        print('----------------------------------------')
+        df = df.append(df_temp, ignore_index=True)
+        print('added: ', df_temp.shape)
 
-        # df_temp = pd.read_csv(pd.compat.StringIO(this_data), sep=';', comment='#', engine='python', names=field_names,
-        #                       quotechar="|", encoding='cp1250')
-        #
-        # i = df_temp[(df_temp['IBANStrony'] == 'IBAN strony')].index
-        # df_temp = df_temp.drop(i)
-        #
-        # df = df.append(df_temp, ignore_index=True)
-        # print('added: ', df_temp.shape)
-
-    # print("Whole dataframe shape: ", df.shape)
-    # print(df.info())
+    print("Whole dataframe shape: ", df.shape)
+    print(df.info())
+    # pd.set_option('display.max_columns', None)
+    # print(df.sample(10))
 
     return df
