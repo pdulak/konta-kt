@@ -11,7 +11,8 @@ def get_account_balance():
         .select_related('account') \
         .select_related('bank') \
         .select_related('currency') \
-        .values('account', 'account__name', 'account__bank__name', 'account__currency__name') \
+        .values('account', 'account__name', 'account__bank__name', 'account__bank__id', 'account__bank__hide',
+                'account__currency__name') \
         .annotate(
             total=Sum('amount_account_currency'),
             down=Sum('amount_account_currency', filter=Q(amount_account_currency__lt=0)),
@@ -20,7 +21,7 @@ def get_account_balance():
         .annotate(
             ttotal=Cast('total', DecimalField(max_digits=14, decimal_places=2)),
         ) \
-        .order_by('account')
+        .order_by('account__bank__hide', 'account__bank__name', 'account')
 
 
 def get_monthly_review():
@@ -35,7 +36,13 @@ def get_monthly_review():
 
 
 def get_transactions_review():
-    return Transaction.objects\
+    return Transaction.objects \
+        .select_related('account') \
+        .select_related('bank') \
+        .select_related('currency') \
+        .select_related('category') \
+        .values('account', 'account__name', 'amount_account_currency', 'date', 'description', 'account__currency__name',
+                'category__name', 'category__id', 'type', 'account__bank__name', 'irrelevant') \
         .order_by('-date')
 
 

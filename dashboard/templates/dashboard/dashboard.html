@@ -1,31 +1,91 @@
 {% extends 'dashboard/layout.html' %}
 
-{% block content %}
-    <h3>Account Balance</h3>
-    {% if accounts_list %}
-        <ul>
-        {% for account in accounts_list %}
-            <li>{{ account.account__bank__name }} - {{ account.account__name }} -  {{ account.account__currency__name }}:
-                <strong>{{ account.total|floatformat:2 }}</strong>;
-                <!--UP: <strong>{{ account.up|floatformat:2 }}</strong>;-->
-                <!--DOWN: <strong>{{ account.down|floatformat:2 }}</strong>-->
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No transactions are available.</p>
-    {% endif %}
-
-
+{% block monthly_review %}
     <h3>Monthly review</h3>
     {% if months_list %}
         <ul>
         {% for month in months_list %}
-            <li>{{ month.month }}: {{ month.total }}; UP: {{ month.up }}; DOWN: {{ month.down }}</li>
+            <li>{{ month.month }}: <strong>{{ month.total|floatformat:2  }}</strong>; UP: {{ month.up|floatformat:2  }}; DOWN: {{ month.down|floatformat:2 }}</li>
         {% endfor %}
         </ul>
     {% else %}
         <p>No transactions are available.</p>
     {% endif %}
 
+{% endblock %}
+
+{% block transactions_review %}
+    <h3>Transactions review</h3>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th class="text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if transactions_list %}
+                    {% for t in transactions_list %}
+                        {% ifchanged t.date %}
+                            <tr>
+                                <td colspan="3"></td>
+                            </tr>
+                        {% endifchanged %}
+                        <tr>
+                            <td>{{ t.date }}</td>
+                            <td {% if t.irrelevant %} style="color: #aaa" {% endif %} >
+                                {{ t.description }}
+                                <div class="text-right">category: {{ t.category__name }}</div>
+                                <div class="text-right">account: {{t.account__bank__name}} - {{ t.account__name }}; type: {{ t.type }}</div>
+                            </td>
+                            <td class="text-right">{{ t.amount_account_currency|floatformat:2 }} {{ t.account__currency__name }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block accounts_info %}
+    <div class="accordion" id="accountAccordion">
+        <div>
+            <div>
+                <div>
+
+        {% if accounts_list %}
+            {% for account in accounts_list %}
+                {% ifchanged account.account__bank__name %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="heading{{ account.account__bank__id }}" style="padding: 2px">
+                            <button class="btn btn-link {% if account.account__bank__hide == 1 %}collapsed{% endif %}" type="button" data-toggle="collapse"
+                                        data-target="#collapse{{ account.account__bank__id }}" aria-expanded="true"
+                                        aria-controls="collapse{{ account.account__bank__id }}" style="padding: 2px">
+                                    {{ account.account__bank__name }}
+                            </button>
+                        </div>
+                        <div id="collapse{{ account.account__bank__id }}" class="collapse {% if account.account__bank__hide != 1 %}show{% endif %}"
+                             aria-labelledby="heading{{ account.account__bank__id }}"
+                             data-parent="#accountAccordion">
+                            <div class="card-body" style="padding: 5px">
+                {% endifchanged %}
+
+                                <div>
+                                    <div>{{ account.account__name }}</div>
+                                    <div class="text-right"><strong>{{ account.total|floatformat:2 }}</strong> {{ account.account__currency__name }}</div>
+                                </div>
+            {% endfor %}
+        {% else %}
+            <p>No accounts are available.</p>
+        {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -26,80 +26,35 @@
                         <ul class="nav flex-column">
                             <li class="nav-item">
                                 <a class="nav-link active" href="/">
-                                    <span data-feather="home"></span>
-                                    Dashboard <span class="sr-only">(current)</span>
+                                    Dashboard
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/transactions/account_balance/">
-                                    <span data-feather="file"></span>
                                     Account Balance
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="transactions/monthly_review/">
-                                    <span data-feather="shopping-cart"></span>
                                     Monthly Review
                                 </a>
                             </li>
-                            <!--<li class="nav-item">-->
-                                <!--<a class="nav-link" href="#">-->
-                                    <!--<span data-feather="users"></span>-->
-                                    <!--Customers-->
-                                <!--</a>-->
-                            <!--</li>-->
-                            <!--<li class="nav-item">-->
-                                <!--<a class="nav-link" href="#">-->
-                                    <!--<span data-feather="bar-chart-2"></span>-->
-                                    <!--Reports-->
-                                <!--</a>-->
-                            <!--</li>-->
-                            <!--<li class="nav-item">-->
-                                <!--<a class="nav-link" href="#">-->
-                                    <!--<span data-feather="layers"></span>-->
-                                    <!--Integrations-->
-                                <!--</a>-->
-                            <!--</li>-->
+
                         </ul>
+
+                        {% block accounts_info %}
+                        {% endblock %}
                     </div>
                 </nav>
 
                 <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
 
                     <h1>Konta-kt</h1>
-                    {% block content %}
+                    {% block monthly_review %}
                     {% endblock %}
 
-                    <h2>Section title</h2>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm">
-                            <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Header</th>
-                                <th>Header</th>
-                                <th>Header</th>
-                                <th>Header</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>1,001</td>
-                                <td>Lorem</td>
-                                <td>ipsum</td>
-                                <td>dolor</td>
-                                <td>sit</td>
-                            </tr>
-                            <tr>
-                                <td>1,002</td>
-                                <td>amet</td>
-                                <td>consectetur</td>
-                                <td>adipiscing</td>
-                                <td>elit</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    {% block transactions_review %}
+                    {% endblock %}
                 </main>
             </div>
         </div>
