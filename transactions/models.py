@@ -67,6 +67,7 @@ class TransactionImportTemp(models.Model):
     type = models.CharField(max_length=2000, blank=True, null=True)
     party_name = models.CharField(max_length=500, blank=True, null=True)
     party_IBAN = models.CharField(max_length=200, blank=True, null=True)
+    is_duplicate = models.BooleanField(default=False, blank=True, null=True)
 
     def __str__(self):
         return self.imported_description + '; ' + str(self.date) + '; ' + str(self.amount) + ' PLN; ' + str(self.amount_account_currency) + ' ' + str(self.account.currency.name)

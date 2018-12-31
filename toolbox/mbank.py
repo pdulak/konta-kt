@@ -29,6 +29,10 @@ def trim_description(x):
     return x
 
 
+def trim_text_fields(x):
+    return ' '.join(str(x).split())
+
+
 def load_csv():
     # load all csv files from temp dir
     sourceDir = os.path.join(settings.BASE_DIR, 'temp')
@@ -65,12 +69,21 @@ def load_csv():
         df_temp = pd.read_csv(pd.compat.StringIO(this_data), sep=';', comment='#', engine='python', names=field_names,
                               quotechar='|', encoding='cp1250')
 
+        # pd.set_option('display.max_columns', None)
+        # print(df_temp.head(10))
+
         df_temp['Account Number'] = this_account_number
         df_temp['Source'] = os.path.basename(this_file)
         df_temp['Description'] = df_temp['Description'].fillna('')
         df_temp['Party IBAN'] = df_temp['Party IBAN'].fillna('')
+        df_temp['Party Name'] = df_temp['Party IBAN'].fillna('')
+        df_temp['Type'] = df_temp['Party IBAN'].fillna('')
+
         df_temp['Date Modified'] = df_temp['Description'].map(extract_date_from_description)
-        df_temp['Description'] = df_temp['Description'].map(trim_description)
+        df_temp['Description'] = df_temp['Description'].map(trim_text_fields)
+        df_temp['Party Name'] = df_temp['Party Name'].map(trim_text_fields)
+        df_temp['Type'] = df_temp['Type'].map(trim_text_fields)
+
         df_temp['Date Modified'] = df_temp['Date Modified'].fillna(df_temp['Date'])
         df_temp['Amount Modified'] = df_temp['Amount'].map(
             lambda x: float(re.sub('[^0-9\,\.-]','', x).replace(',', '.')))
@@ -82,6 +95,7 @@ def load_csv():
 
     print("Whole dataframe shape: ", df.shape)
     print(df.info())
+
     # pd.set_option('display.max_columns', None)
     # print(df.sample(10))
 
@@ -113,7 +127,40 @@ def do_import(df):
                     last_account = row['Account Number']
                     print(datetime.datetime.now(), ' importing ', last_account, '; ', last_source)
 
-                this_transaction, created = TransactionImportTemp.objects.get_or_create(
+                # check for transaction duplicate
+                is_duplicate = False
+
+                chk_transaction = Transaction.objects.filter(date=row['Date Modified'],
+                                                             account=accounts_numbers[row['Account Number']],
+                                                             amount_account_currency=row['Amount Modified'],
+                                                             balance_account_currency=row['Balance Modified'],
+                                                             imported_description__contains=row['Description']
+                                                             ).count()
+
+                if chk_transaction > 0:
+                    is_duplicate = True
+                else:
+                    # insert if not duplicate
+                    Transaction.objects.create(
+                        account=accounts_numbers[row['Account Number']],
+                        import_header=import_headers[row['Source']],
+                        uuid_text=row['Date Modified'] + "__" + str(row['Amount Modified']),
+                        date=row['Date Modified'],
+                        added=row['Added'],
+                        amount=row['Amount Modified'],
+                        balance=row['Balance Modified'],
+                        amount_account_currency=row['Amount Modified'],
+                        balance_account_currency=row['Balance Modified'],
+                        currency_multiplier=1,
+                        description=row['Description'],
+                        imported_description=row['Description'],
+                        type=row['Type'],
+                        party_name=row['Party Name'],
+                        party_IBAN=row['Party IBAN']
+                    )
+
+                # insert into import temp
+                TransactionImportTemp.objects.create(
                     account=accounts_numbers[row['Account Number']],
                     import_header=import_headers[row['Source']],
                     uuid_text=row['Date Modified']+"__"+str(row['Amount Modified']),
@@ -127,12 +174,11 @@ def do_import(df):
                     imported_description=row['Description'],
                     type=row['Type'],
                     party_name=row['Party Name'],
-                    party_IBAN=row['Party IBAN']
+                    party_IBAN=row['Party IBAN'],
+                    is_duplicate=is_duplicate
                 )
             else:
                 print("Account number ", row['Account Number'], " not found")
-
-        # copy from temp to main table
 
     else:
         print('Accounts with numbers not found')
