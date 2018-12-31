@@ -1,0 +1,10 @@
+<h2>Transactions review</h2>
+{% if transactions_list %}
+    <ul>
+    {% for transaction in transactions_list %}
+        <li>{{ transaction }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No transactions are available.</p>
+{% endif %}

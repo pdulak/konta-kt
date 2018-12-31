@@ -48,7 +48,8 @@ class Transaction(models.Model):
     irrelevant = models.BooleanField(default=False, blank=True, null=True)
 
     def __str__(self):
-        return self.description + '; ' + self.imported_description + '; ' + str(self.date) + '; ' + str(self.amount) + ' PLN; ' + str(self.amount_account_currency) + ' ' + str(self.account.currency.name)
+        return self.description + '; ' + self.imported_description + '; ' + str(self.date) + '; ' + str(self.amount) \
+               + ' PLN; ' + str(self.amount_account_currency) + ' ' + str(self.account.currency.name)
 
 
 class TransactionImportTemp(models.Model):

@@ -34,6 +34,11 @@ def get_monthly_review():
         .order_by('-month')
 
 
+def get_transactions_review():
+    return Transaction.objects\
+        .order_by('-date')
+
+
 def index(request):
     return HttpResponse("Hello, world. You're at the transactions index.")
 
@@ -51,3 +56,9 @@ def account_balance(request):
     }
     return render(request, 'transactions/account_balance.html', context)
 
+
+def transactions_review(request):
+    context = {
+        'transactions_list': get_transactions_review()[:100],
+    }
+    return render(request, 'transactions/transactions_review.html', context)
