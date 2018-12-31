@@ -6,28 +6,8 @@ from django.db.models.functions import TruncMonth, TruncYear, Cast
 from .models import Transaction
 
 
-def index(request):
-    return HttpResponse("Hello, world. You're at the transactions index.")
-
-
-def monthly_review(request):
-    months_list = Transaction.objects.filter(irrelevant=False)\
-        .values(month=TruncMonth('date'))\
-        .annotate(
-            total=Sum('amount'),
-            down=Sum('amount', filter=Q(amount__lt=0)),
-            up=Sum('amount', filter=Q(amount__gt=0)),
-        )\
-        .order_by('-month')
-
-    context = {
-        'months_list': months_list,
-    }
-    return render(request, 'transactions/monthly_review.html', context)
-
-
-def account_balance(request):
-    accounts_list = Transaction.objects \
+def get_account_balance():
+    return Transaction.objects \
         .select_related('account') \
         .select_related('bank') \
         .select_related('currency') \
@@ -42,8 +22,32 @@ def account_balance(request):
         ) \
         .order_by('account')
 
+
+def get_monthly_review():
+    return Transaction.objects.filter(irrelevant=False)\
+        .values(month=TruncMonth('date'))\
+        .annotate(
+            total=Sum('amount'),
+            down=Sum('amount', filter=Q(amount__lt=0)),
+            up=Sum('amount', filter=Q(amount__gt=0)),
+        )\
+        .order_by('-month')
+
+
+def index(request):
+    return HttpResponse("Hello, world. You're at the transactions index.")
+
+
+def monthly_review(request):
     context = {
-        'accounts_list': accounts_list,
+        'months_list': get_monthly_review(),
+    }
+    return render(request, 'transactions/monthly_review.html', context)
+
+
+def account_balance(request):
+    context = {
+        'accounts_list': get_account_balance(),
     }
     return render(request, 'transactions/account_balance.html', context)
 

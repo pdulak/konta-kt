@@ -1,5 +1,31 @@
 {% extends 'dashboard/layout.html' %}
 
 {% block content %}
-    <h3>Block content</h3>
+    <h3>Account Balance</h3>
+    {% if accounts_list %}
+        <ul>
+        {% for account in accounts_list %}
+            <li>{{ account.account__bank__name }} - {{ account.account__name }} -  {{ account.account__currency__name }}:
+                <strong>{{ account.total|floatformat:2 }}</strong>;
+                <!--UP: <strong>{{ account.up|floatformat:2 }}</strong>;-->
+                <!--DOWN: <strong>{{ account.down|floatformat:2 }}</strong>-->
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No transactions are available.</p>
+    {% endif %}
+
+
+    <h3>Monthly review</h3>
+    {% if months_list %}
+        <ul>
+        {% for month in months_list %}
+            <li>{{ month.month }}: {{ month.total }}; UP: {{ month.up }}; DOWN: {{ month.down }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No transactions are available.</p>
+    {% endif %}
+
 {% endblock %}
