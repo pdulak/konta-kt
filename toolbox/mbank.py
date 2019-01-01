@@ -76,8 +76,8 @@ def load_csv():
         df_temp['Source'] = os.path.basename(this_file)
         df_temp['Description'] = df_temp['Description'].fillna('')
         df_temp['Party IBAN'] = df_temp['Party IBAN'].fillna('')
-        df_temp['Party Name'] = df_temp['Party IBAN'].fillna('')
-        df_temp['Type'] = df_temp['Party IBAN'].fillna('')
+        df_temp['Party Name'] = df_temp['Party Name'].fillna('')
+        df_temp['Type'] = df_temp['Type'].fillna('')
 
         df_temp['Date Modified'] = df_temp['Description'].map(extract_date_from_description)
         df_temp['Description'] = df_temp['Description'].map(trim_text_fields)
