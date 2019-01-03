@@ -43,7 +43,7 @@ def get_transactions_review():
         .select_related('category') \
         .values('account', 'account__name', 'amount_account_currency', 'date', 'description', 'account__currency__name',
                 'category__name', 'category__id', 'type', 'account__bank__name', 'irrelevant') \
-        .order_by('-date')
+        .order_by('-date', '-id')
 
 
 def index(request):
