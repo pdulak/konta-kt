@@ -90,3 +90,5 @@ local_settings.py
 
 ### Application specific ###
 temp/*
+.idea/*
+venv/*
