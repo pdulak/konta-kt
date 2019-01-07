@@ -67,7 +67,7 @@ def load_csv():
                         save_transactions = False
 
         df_temp = pd.read_csv(pd.compat.StringIO(this_data), sep=';', comment='#', engine='python', names=field_names,
-                              quotechar='|', encoding='cp1250')
+                              quotechar='|', encoding='cp1250', dtype={'Party IBAN': 'str'})
 
         # pd.set_option('display.max_columns', None)
         # print(df_temp.head(10))
@@ -95,6 +95,8 @@ def load_csv():
 
     print("Whole dataframe shape: ", df.shape)
     print(df.info())
+
+    # print(df["Party IBAN"].value_counts())
 
     # pd.set_option('display.max_columns', None)
     # print(df.sample(10))
