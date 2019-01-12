@@ -125,7 +125,6 @@
             bodyToFill.empty();
 
             t.forEach(function(e){
-                console.log(e);
                 thisRow = document.createElement("tr");
                 thisRow.setAttribute('data-transaction-id', e.id);
                 if (lastDate != e.date) {
@@ -141,19 +140,23 @@
         }
 
         function load_transactions() {
+            $('#transactions_table').addClass('loading');
+
             $.ajax({
                 type: "POST",
                 url: /j_transactions/,
-                data: { 't': 1 },
+                data: $(document.filters).serialize(),
                 success: function(data) {
                     if (data.transactions_list) {
                         fill_transactions(data.transactions_list);
                     } else {
                         alert('transactions not loaded');
                     }
+                    $('#transactions_table').removeClass('loading');
                 },
                 dataType: 'json',
                 failure: function(errMsg) {
+                    $('#transactions_table').removeClass('loading');
                     alert(errMsg);
                 }
             });

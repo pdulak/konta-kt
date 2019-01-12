@@ -35,15 +35,23 @@ def get_monthly_review():
         .order_by('-month')
 
 
-def get_transactions_review():
-    return Transaction.objects \
-        .select_related('account') \
+def get_transactions_review(irrelevant=''):
+    t = Transaction.objects
+
+    if irrelevant == 'T':
+        t = t.filter(irrelevant=1)
+    elif irrelevant == 'F':
+        t = t.filter(irrelevant=0)
+
+    t = t.select_related('account') \
         .select_related('bank') \
         .select_related('currency') \
         .select_related('category') \
         .values('account', 'account__name', 'amount_account_currency', 'date', 'description', 'account__currency__name',
                 'category__name', 'category__id', 'type', 'account__bank__name', 'irrelevant', 'id') \
         .order_by('-date', '-id')
+
+    return t
 
 
 def index(request):
