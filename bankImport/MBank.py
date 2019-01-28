@@ -1,4 +1,5 @@
 import os
+import time
 import unittest
 import getpass
 from bankImport import SeleniumDrivers
@@ -78,6 +79,8 @@ class MBank(unittest.TestCase):
             accounts = [x for x in accountsCombo.find_elements_by_tag_name("option")]
             accounts[i].click()
             driver.find_element_by_id("Submit").click()
+            time.sleep(1)
+
 
     def tearDown(self):
         # nothing to do

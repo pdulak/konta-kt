@@ -12,7 +12,7 @@ def get_account_balance():
         .select_related('bank') \
         .select_related('currency') \
         .values('account', 'account__name', 'account__bank__name', 'account__bank__id', 'account__bank__hide',
-                'account__currency__name') \
+                'account__currency__name', 'account__id') \
         .annotate(
             total=Sum('amount_account_currency'),
             down=Sum('amount_account_currency', filter=Q(amount_account_currency__lt=0)),
@@ -35,7 +35,7 @@ def get_monthly_review():
         .order_by('-month')
 
 
-def get_transactions_review(irrelevant=''):
+def get_transactions_review(irrelevant='', account_id='', direction=''):
     t = Transaction.objects
 
     if irrelevant == 'T':
@@ -43,12 +43,20 @@ def get_transactions_review(irrelevant=''):
     elif irrelevant == 'F':
         t = t.filter(irrelevant=0)
 
+    if account_id.isdigit():
+        t = t.filter(account__id=account_id)
+
+    if direction == 'I':
+        t = t.filter(amount_account_currency__gte=0)
+    elif direction == 'O':
+        t = t.filter(amount_account_currency__lte=0)
+
     t = t.select_related('account') \
         .select_related('bank') \
         .select_related('currency') \
         .select_related('category') \
         .values('account', 'account__name', 'amount_account_currency', 'date', 'description', 'account__currency__name',
-                'category__name', 'category__id', 'type', 'account__bank__name', 'irrelevant', 'id') \
+                'category__name', 'category__id', 'type', 'account__bank__name', 'irrelevant', 'id', 'account__id') \
         .order_by('-date', '-id')
 
     return t
@@ -74,6 +82,6 @@ def account_balance(request):
 
 def transactions_review(request):
     context = {
-        'transactions_list': get_transactions_review()[:100],
+        'transactions_list': get_transactions_review()[:500],
     }
     return render(request, 'transactions/transactions_review.html', context)

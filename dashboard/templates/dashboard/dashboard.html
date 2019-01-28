@@ -1,5 +1,31 @@
 {% extends 'dashboard/layout.html' %}
 
+{% block filter_form %}
+    <form name="filters">
+        <select name="irrelevant">
+            <option value="">istotne i nieistotne</option>
+            <option value="F">tylko istotne</option>
+            <option value="T">tylko nieistotne</option>
+        </select>
+        <select name="direction">
+            <option value="">przychody i wydatki</option>
+            <option value="I">tylko przychody</option>
+            <option value="O">tylko wydatki</option>
+        </select>
+        {% if accounts_list %}
+            <select name="account">
+                <option value="">Wszystkie konta</option>
+                {% for account in accounts_list %}
+                    <option value="{{ account.account__id }}"> {{ account.account__bank__name }}: {{ account.account__name }} </option>
+                {% endfor %}
+            </select>
+        {% else %}
+            <input type="hidden" name="account" value="">
+        {% endif %}
+        <button onclick="load_transactions(); return false;">&#x21bb;</button>
+    </form>
+{% endblock %}
+
 {% block monthly_review %}
     <h3>Monthly review</h3>
     {% if months_list %}

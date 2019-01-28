@@ -56,14 +56,8 @@
 
                     <h1>Konta-kt</h1>
 
-                    <form name="filters">
-                        <select name="irrelevant">
-                            <option value="">istotne i nieistotne</option>
-                            <option value="F">tylko istotne</option>
-                            <option value="T">tylko nieistotne</option>
-                        </select>
-                        <button onclick="load_transactions(); return false;">&#x21bb;</button>
-                    </form>
+                    {% block filter_form %}
+                    {% endblock %}
 
                     {% block monthly_review %}
                     {% endblock %}

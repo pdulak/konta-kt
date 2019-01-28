@@ -15,6 +15,8 @@ def index(request):
 
 def j_transactions(request):
     data = {
-        'transactions_list': list(get_transactions_review(irrelevant=request.POST.get('irrelevant'))[:100]),
+        'transactions_list': list(get_transactions_review(irrelevant=request.POST.get('irrelevant'),
+                                                          account_id=request.POST.get('account'),
+                                                          direction=request.POST.get('direction'))[:500]),
     }
     return JsonResponse(data)
