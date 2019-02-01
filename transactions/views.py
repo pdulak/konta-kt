@@ -57,7 +57,7 @@ def get_transactions_review(irrelevant='', account_id='', direction=''):
         .select_related('category') \
         .values('account', 'account__name', 'amount_account_currency', 'date', 'description', 'account__currency__name',
                 'category__name', 'category__id', 'type', 'account__bank__name', 'irrelevant', 'id', 'account__id') \
-        .order_by('-date', '-id')
+        .order_by('-date', 'irrelevant', '-id')
 
     return t
 
