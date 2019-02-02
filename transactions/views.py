@@ -1,9 +1,20 @@
+from datetime import datetime, date
+from dateutil.relativedelta import relativedelta
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import Count, Sum, F, Q, DecimalField
 from django.db.models.functions import TruncMonth, TruncYear, Cast
 
 from .models import Transaction
+
+
+def chk_date(date_text):
+    try:
+        if date_text != datetime.strptime(date_text, "%Y-%m-%d").strftime('%Y-%m-%d'):
+            raise ValueError
+        return True
+    except ValueError:
+        return False
 
 
 def get_account_balance():
@@ -35,7 +46,7 @@ def get_monthly_review():
         .order_by('-month')
 
 
-def get_transactions_review(irrelevant='', account_id='', direction=''):
+def get_transactions_review(irrelevant='', account_id='', direction='', startDate='', endDate=''):
     t = Transaction.objects
 
     if irrelevant == 'T':
@@ -51,6 +62,20 @@ def get_transactions_review(irrelevant='', account_id='', direction=''):
     elif direction == 'O':
         t = t.filter(amount_account_currency__lte=0)
 
+    # check date fields, set minimum and maximum date properly
+    if chk_date(startDate):
+        filter_start_date = datetime.strptime(startDate, "%Y-%m-%d")
+    else:
+        d = date.today() - relativedelta(months=1)
+        filter_start_date = date(d.year, d.month, 1)
+
+    if chk_date(endDate):
+        filter_end_date = datetime.strptime(endDate, "%Y-%m-%d")
+    else:
+        filter_end_date = date.today()
+
+    t = t.filter(date__gte=filter_start_date).filter(date__lte=filter_end_date)
+
     t = t.select_related('account') \
         .select_related('bank') \
         .select_related('currency') \
@@ -59,7 +84,7 @@ def get_transactions_review(irrelevant='', account_id='', direction=''):
                 'category__name', 'category__id', 'type', 'account__bank__name', 'irrelevant', 'id', 'account__id') \
         .order_by('-date', 'irrelevant', '-id')
 
-    return t
+    return t, filter_start_date.strftime('%Y-%m-%d'), filter_end_date.strftime('%Y-%m-%d')
 
 
 def index(request):

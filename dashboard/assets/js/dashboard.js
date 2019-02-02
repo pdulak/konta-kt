@@ -22,9 +22,13 @@ function fill_transaction_row(e, rowToFill) {
     return rowToFill;
 }
 
-function fill_transactions(t) {
+function fill_transactions(data) {
     var bodyToFill = $('#transactions_table tbody');
     var lastDate;
+    var t = data.transactions_list;
+
+    document.filters.startDate.value = data.startDate;
+    document.filters.endDate.value = data.endDate;
 
     bodyToFill.empty();
 
@@ -52,7 +56,7 @@ function load_transactions() {
         data: $(document.filters).serialize(),
         success: function(data) {
             if (data.transactions_list) {
-                fill_transactions(data.transactions_list);
+                fill_transactions(data);
             } else {
                 alert('transactions not loaded');
             }

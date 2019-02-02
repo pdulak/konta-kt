@@ -14,9 +14,14 @@ def index(request):
 
 
 def j_transactions(request):
-    data = {
-        'transactions_list': list(get_transactions_review(irrelevant=request.POST.get('irrelevant'),
+    transactions_query, filter_start_date, filter_end_date = get_transactions_review(irrelevant=request.POST.get('irrelevant'),
                                                           account_id=request.POST.get('account'),
-                                                          direction=request.POST.get('direction'))[:500]),
+                                                          direction=request.POST.get('direction'),
+                                                          startDate=request.POST.get('startDate'),
+                                                          endDate=request.POST.get('endDate'))
+    data = {
+        'transactions_list': list(transactions_query),
+        'startDate': filter_start_date,
+        'endDate': filter_end_date
     }
     return JsonResponse(data)
