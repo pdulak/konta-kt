@@ -1,13 +1,15 @@
 function fill_transaction_row(e, rowToFill) {
     // date
     dateCell = document.createElement("td");
-    $(dateCell).html(e.date);
+    $(dateCell).html(e.date + '<br /><button onclick="transaction_menu(' + e.id + '); return false;" class="btn btn-light btn-sm">&#9874;</button>');
     rowToFill.appendChild(dateCell);
 
     // transaction
     transactionCell = document.createElement("td");
+    transactionCell.setAttribute('data-irrelevant','0');
     if (e.irrelevant) {
         transactionCell.style.color = '#aaa';
+        transactionCell.setAttribute('data-irrelevant','1');
     }
     transactionCell.innerHTML = e.description + '<div class="text-right">category: ' + e.category__name + '</div>' +
             '<div class="text-right">account: ' + e.account__bank__name + ' - ' + e.account__name + '; type: ' + e.type + '</div>';
@@ -79,6 +81,10 @@ function reset_filters() {
     document.filters.startDate.value = "";
     document.filters.endDate.value = "";
     load_transactions();
+}
+
+function transaction_menu(t_id) {
+    $('#transactionsModal').modal();
 }
 
 Date.prototype.yyyymmdd = function() {
