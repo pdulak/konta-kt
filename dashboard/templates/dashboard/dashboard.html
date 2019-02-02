@@ -2,27 +2,46 @@
 
 {% block filter_form %}
     <form name="filters">
-        <select name="irrelevant">
-            <option value="">istotne i nieistotne</option>
-            <option value="F">tylko istotne</option>
-            <option value="T">tylko nieistotne</option>
-        </select>
-        <select name="direction">
-            <option value="">przychody i wydatki</option>
-            <option value="I">tylko przychody</option>
-            <option value="O">tylko wydatki</option>
-        </select>
-        {% if accounts_list %}
-            <select name="account">
-                <option value="">Wszystkie konta</option>
-                {% for account in accounts_list %}
-                    <option value="{{ account.account__id }}"> {{ account.account__bank__name }}: {{ account.account__name }} </option>
-                {% endfor %}
-            </select>
-        {% else %}
-            <input type="hidden" name="account" value="">
-        {% endif %}
-        <button onclick="load_transactions(); return false;">&#x21bb;</button>
+        <div class="form-row">
+            <div class="col">
+                <select name="irrelevant" class="form-control form-control-sm">
+                    <option value="">istotne i nieistotne</option>
+                    <option value="F">tylko istotne</option>
+                    <option value="T">tylko nieistotne</option>
+                </select>
+            </div>
+            <div class="col">
+                <select name="direction" class="form-control form-control-sm">
+                    <option value="">przychody i wydatki</option>
+                    <option value="I">tylko przychody</option>
+                    <option value="O">tylko wydatki</option>
+                </select>
+            </div>
+            {% if accounts_list %}
+                <div class="col">
+                    <select name="account" class="form-control form-control-sm">
+                        <option value="">Wszystkie konta</option>
+                        {% for account in accounts_list %}
+                            <option value="{{ account.account__id }}"> {{ account.account__bank__name }}: {{ account.account__name }} </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% else %}
+                <input type="hidden" name="account" value="">
+            {% endif %}
+        </div>
+        <div class="form-row">
+            <div class="col">
+                <input type="text" class="form-control form-control-sm" placeholder="od daty" name="startDate">
+            </div>
+            <div class="col">
+                <input type="text" class="form-control form-control-sm" placeholder="do daty" name="endDate">
+            </div>
+            <div class="col">
+                <button onclick="load_transactions(); return false;" class="btn btn-primary btn-sm">&#x21bb;</button>
+                <button onclick="reset_filters(); return false;" class="btn btn-warning btn-sm">&#x274C;</button>
+            </div>
+        </div>
     </form>
 {% endblock %}
 
@@ -188,8 +207,20 @@
             });
         }
 
+        function reset_filters() {
+            document.filters.irrelevant.selectedIndex = 0;
+            document.filters.direction.selectedIndex = 0;
+            if (document.filters.account.tagName == "SELECT") {
+                document.filters.account.selectedIndex = 0;
+            }
+            document.filters.startDate.value = "";
+            document.filters.endDate.value = "";
+            load_transactions();
+        }
+
         $(function(){
             load_transactions();
         });
+
     </script>
 {% endblock %}
