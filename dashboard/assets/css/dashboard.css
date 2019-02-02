@@ -106,6 +106,15 @@ body {
 }
 
 /*
+ * Monthly Review
+ */
+.monthlyReview li span {
+    cursor: pointer;
+    color: #c97526;
+}
+
+
+/*
  * LOADING
  */
 

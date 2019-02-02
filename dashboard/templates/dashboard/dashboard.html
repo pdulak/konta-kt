@@ -48,9 +48,9 @@
 {% block monthly_review %}
     <h3>Monthly review</h3>
     {% if months_list %}
-        <ul>
+        <ul class="monthlyReview">
         {% for month in months_list %}
-            <li>{{ month.month }}: <strong>{{ month.total|floatformat:2  }}</strong>; UP: {{ month.up|floatformat:2  }}; DOWN: {{ month.down|floatformat:2 }}</li>
+            <li><span data-date="{{ month.month|date:"Y-m" }}">{{ month.month|date:"Y M" }}</span>: <strong>{{ month.total|floatformat:2  }}</strong>; UP: {{ month.up|floatformat:2  }}; DOWN: {{ month.down|floatformat:2 }}</li>
         {% endfor %}
         </ul>
     {% else %}
@@ -61,8 +61,6 @@
 
 {% block transactions_review %}
     <h3>Transactions review</h3>
-
-
 
     <div class="table-responsive">
         <table class="table table-striped table-sm" id="transactions_table">

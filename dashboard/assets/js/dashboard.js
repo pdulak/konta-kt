@@ -81,6 +81,24 @@ function reset_filters() {
     load_transactions();
 }
 
+Date.prototype.yyyymmdd = function() {
+    var yyyy = this.getFullYear();
+    var mm = this.getMonth() < 9 ? "0" + (this.getMonth() + 1) : (this.getMonth() + 1); // getMonth() is zero-based
+    var dd  = this.getDate() < 10 ? "0" + this.getDate() : this.getDate();
+    return "".concat(yyyy).concat("-").concat(mm).concat("-").concat(dd);
+};
+
 $(function(){
     load_transactions();
+    $('.monthlyReview li span').on('click',function(e){
+        // calculate
+        dateArr = $(this).data('date').split('-');
+        firstDay = new Date(dateArr[0], dateArr[1]-1, 1);
+        lastDay = new Date(dateArr[0], dateArr[1], 0);
+        // fill
+        document.filters.startDate.value = firstDay.yyyymmdd();
+        document.filters.endDate.value = lastDay.yyyymmdd();
+        // execute reload
+        load_transactions();
+    })
 });

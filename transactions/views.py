@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import Count, Sum, F, Q, DecimalField
-from django.db.models.functions import TruncMonth, TruncYear, Cast
+from django.db.models.functions import TruncMonth, Cast
 
 from .models import Transaction
 
@@ -49,14 +49,17 @@ def get_monthly_review():
 def get_transactions_review(irrelevant='', account_id='', direction='', startDate='', endDate=''):
     t = Transaction.objects
 
+    # relevancy filter
     if irrelevant == 'T':
         t = t.filter(irrelevant=1)
     elif irrelevant == 'F':
         t = t.filter(irrelevant=0)
 
+    # account filter
     if account_id.isdigit():
         t = t.filter(account__id=account_id)
 
+    # direction filter
     if direction == 'I':
         t = t.filter(amount_account_currency__gte=0)
     elif direction == 'O':
@@ -76,6 +79,7 @@ def get_transactions_review(irrelevant='', account_id='', direction='', startDat
 
     t = t.filter(date__gte=filter_start_date).filter(date__lte=filter_end_date)
 
+    # the query itself
     t = t.select_related('account') \
         .select_related('bank') \
         .select_related('currency') \
