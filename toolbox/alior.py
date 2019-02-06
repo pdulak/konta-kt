@@ -2,13 +2,8 @@ import os
 import re
 import glob
 import pandas as pd
-import datetime
 
 from django.conf import settings
-
-from .models import ImportHeader
-from accounts.models import Account
-from transactions.models import TransactionType, Transaction, TransactionImportTemp
 
 
 def get_account_number(x):
@@ -94,7 +89,7 @@ def load_csv():
 
     # print(df["Party IBAN"].value_counts())
 
-    pd.set_option('display.max_columns', None)
-    print(df.head(6))
+    # pd.set_option('display.max_columns', None)
+    # print(df.head(6))
 
     return df

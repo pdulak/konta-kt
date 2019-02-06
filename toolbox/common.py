@@ -2,7 +2,7 @@ import datetime
 
 from .models import ImportHeader
 from accounts.models import Account
-from transactions.models import TransactionType, Transaction, TransactionImportTemp
+from transactions.models import Transaction, TransactionImportTemp
 
 
 def do_import(df):
