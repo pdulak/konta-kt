@@ -2,6 +2,8 @@ import os
 
 from . import kontomierz
 from . import mbank
+from . import alior
+from . import common
 
 from django.conf import settings
 from django.shortcuts import render
@@ -57,6 +59,14 @@ def load_kontomierz(request):
 def load_mbank(request):
     df = mbank.load_csv()
 
-    mbank.do_import(df)
+    common.do_import(df)
 
-    return HttpResponse("Loading mBank CSV;")
+    return HttpResponse("Loaded mBank CSV;")
+
+
+def load_alior(request):
+    df = alior.load_csv()
+
+    common.do_import(df)
+
+    return HttpResponse("Loaded Alior CSV;")
