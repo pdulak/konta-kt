@@ -127,3 +127,10 @@ def transactions_review(request):
         'transactions_list': get_transactions_review()[:500],
     }
     return render(request, 'transactions/transactions_review.html', context)
+
+
+def months(request):
+    data = {
+        'months': list(get_monthly_review()[:3])
+    }
+    return JsonResponse(data)

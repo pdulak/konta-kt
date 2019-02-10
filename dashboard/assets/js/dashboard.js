@@ -1,8 +1,15 @@
+Date.prototype.yyyymmdd = function() {
+    var yyyy = this.getFullYear();
+    var mm = this.getMonth() < 9 ? "0" + (this.getMonth() + 1) : (this.getMonth() + 1); // getMonth() is zero-based
+    var dd  = this.getDate() < 10 ? "0" + this.getDate() : this.getDate();
+    return "".concat(yyyy).concat("-").concat(mm).concat("-").concat(dd);
+};
+
 function fill_transaction_row(e, rowToFill) {
     // date
     dateCell = document.createElement("td");
-    $(dateCell).html(e.date + '<br /><button onclick="transaction_menu(' + e.id + '); return false;" class="btn btn-light btn-sm">&#9874;</button>'
-        + '<button onclick="change_relevancy(' + e.id + '); return false;" class="btn btn-warning btn-sm">R</button>');
+    $(dateCell).html(e.date + '<div class="buttons"><button onclick="transaction_menu(' + e.id + '); return false;" class="btn btn-light btn-sm">&#9874;</button>'
+        + '<button onclick="change_relevancy(' + e.id + '); return false;" class="btn btn-warning btn-sm">R</button></div>');
     rowToFill.appendChild(dateCell);
 
     // transaction
@@ -102,6 +109,7 @@ function change_relevancy(t_id) {
                 thisRow = $('tr[data-transaction-id=' + t_id + ']');
                 thisRow.empty();
                 thisRow = fill_transaction_row(transactions[t_id], thisRow[0]);
+                load_months();
             },
             dataType: 'json',
             failure: function(errMsg) {
@@ -122,17 +130,7 @@ function transaction_menu(t_id) {
     }
 }
 
-Date.prototype.yyyymmdd = function() {
-    var yyyy = this.getFullYear();
-    var mm = this.getMonth() < 9 ? "0" + (this.getMonth() + 1) : (this.getMonth() + 1); // getMonth() is zero-based
-    var dd  = this.getDate() < 10 ? "0" + this.getDate() : this.getDate();
-    return "".concat(yyyy).concat("-").concat(mm).concat("-").concat(dd);
-};
-
-var transactions = [];
-
-$(function(){
-    load_transactions();
+function set_click_on_months() {
     $('.monthlyReview li span').on('click',function(e){
         // calculate
         dateArr = $(this).data('date').split('-');
@@ -143,5 +141,38 @@ $(function(){
         document.filters.endDate.value = lastDay.yyyymmdd();
         // execute reload
         load_transactions();
+    });
+}
+
+function load_months() {
+    $.ajax({
+        type: 'POST',
+        url: '/transactions/months/',
+        success: function(data) {
+            var m = data.months;
+            $('.monthlyReview').empty();
+            bodyToFill = $('.monthlyReview')[0];
+
+            m.forEach(function(e){
+                thisRow = document.createElement("div");
+                thisRow.innerHTML = '<span class="month" data-date="' + e.month.substring(0,7) + '">' + e.month.substring(0,7) + '</span>'
+                    + ' <span class="total">' + Math.round(e.total * 100)/100 + '</span>'
+                    + ' <span class="up">&#9651; ' + Math.round(e.up * 100)/100 + '</span>'
+                    + ' <span class="down">&#9661; ' + Math.round(e.down * 100)/100 + '</span>';
+
+                bodyToFill.append(thisRow);
+            });
+
+            set_click_on_months();
+        }
     })
+
+
+}
+
+var transactions = [];
+
+$(function(){
+    load_transactions();
+    load_months();
 });

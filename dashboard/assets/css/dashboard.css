@@ -108,11 +108,73 @@ body {
 /*
  * Monthly Review
  */
-.monthlyReview li span {
+.monthlyReview span.month {
     cursor: pointer;
     color: #c97526;
 }
 
+.monthlyReview span.total,
+.monthlyReview span.up,
+.monthlyReview span.down {
+    text-align: right;
+    width: 90px;
+    display: inline-block;
+}
+
+.monthlyReview span.total {
+    font-weight: bold;
+}
+
+.monthlyReview span.up {
+    color: #196400;
+}
+
+.monthlyReview span.down {
+    color: #610600;
+}
+
+/*
+ * Data table
+ */
+
+#transactions_table tr td div.text-right {
+    font-size: 70%;
+}
+
+#transactions_table tr td div.text-right,
+#transactions_table tr td .buttons {
+    display: none;
+}
+
+#transactions_table tr:hover {
+    background-color: #CCFFCC;
+}
+
+#transactions_table tr:hover td div.text-right,
+#transactions_table tr:hover td .buttons {
+    display: block;
+}
+
+/*
+ * Accounts accordion
+ */
+
+#accountAccordion .single-account .col-6 {
+    overflow: hidden;
+    height: 21px;
+}
+
+#accountAccordion .single-account .text-right {
+    font-size: 80%;
+}
+
+#accountAccordion .single-account:hover .col-6 {
+    overflow: auto;
+    height: auto;
+    flex: 0 0 100%;
+    max-width: 100%;
+    background-color: #CCFFCC;
+}
 
 /*
  * LOADING
