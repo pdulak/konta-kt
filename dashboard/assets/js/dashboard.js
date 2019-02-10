@@ -1,7 +1,8 @@
 function fill_transaction_row(e, rowToFill) {
     // date
     dateCell = document.createElement("td");
-    $(dateCell).html(e.date + '<br /><button onclick="transaction_menu(' + e.id + '); return false;" class="btn btn-light btn-sm">&#9874;</button>');
+    $(dateCell).html(e.date + '<br /><button onclick="transaction_menu(' + e.id + '); return false;" class="btn btn-light btn-sm">&#9874;</button>'
+        + '<button onclick="change_relevancy(' + e.id + '); return false;" class="btn btn-warning btn-sm">R</button>');
     rowToFill.appendChild(dateCell);
 
     // transaction
@@ -33,8 +34,10 @@ function fill_transactions(data) {
     document.filters.endDate.value = data.endDate;
 
     bodyToFill.empty();
+    transactions = [];
 
     t.forEach(function(e){
+        transactions[e.id] = e;
         thisRow = document.createElement("tr");
         thisRow.setAttribute('data-transaction-id', e.id);
         if (lastDate != e.date) {
@@ -44,7 +47,6 @@ function fill_transactions(data) {
 
         thisRow = fill_transaction_row(e, thisRow);
 
-
         bodyToFill.append(thisRow);
     });
 }
@@ -53,8 +55,8 @@ function load_transactions() {
     $('#transactions_table').addClass('loading');
 
     $.ajax({
-        type: "POST",
-        url: /j_transactions/,
+        type: 'POST',
+        url: '/j_transactions/',
         data: $(document.filters).serialize(),
         success: function(data) {
             if (data.transactions_list) {
@@ -83,8 +85,41 @@ function reset_filters() {
     load_transactions();
 }
 
+function change_relevancy_modal() {
+    change_relevancy($('#transactionsModal').data('transaciton-id'));
+    $('#transactionsModal').modal('toggle');
+}
+
+function change_relevancy(t_id) {
+    if (transactions[t_id]) {
+        $.ajax({
+            type: 'POST',
+            url: '/transactions/change_relevancy/',
+            data: { 't_id' : t_id,
+                    'r_to_set' : ! transactions[t_id].irrelevant },
+            success: function(data) {
+                transactions[t_id].irrelevant = data.r_set;
+                thisRow = $('tr[data-transaction-id=' + t_id + ']');
+                thisRow.empty();
+                thisRow = fill_transaction_row(transactions[t_id], thisRow[0]);
+            },
+            dataType: 'json',
+            failure: function(errMsg) {
+                alert(errMsg);
+            }
+        });
+    }
+}
+
 function transaction_menu(t_id) {
     $('#transactionsModal').modal();
+    $('#transactionsModal').data('transaciton-id',t_id);
+
+    if (transactions[t_id].irrelevant) {
+        $('#transactionsModal .relevancy').html("Set as relevant");
+    } else {
+        $('#transactionsModal .relevancy').html("Set as irrelevant");
+    }
 }
 
 Date.prototype.yyyymmdd = function() {
@@ -93,6 +128,8 @@ Date.prototype.yyyymmdd = function() {
     var dd  = this.getDate() < 10 ? "0" + this.getDate() : this.getDate();
     return "".concat(yyyy).concat("-").concat(mm).concat("-").concat(dd);
 };
+
+var transactions = [];
 
 $(function(){
     load_transactions();

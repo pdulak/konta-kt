@@ -78,7 +78,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="transactionsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="transactionsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-transaction-id="">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -89,9 +89,6 @@
                 </div>
             <div class="modal-body">
                 <div class="row">
-                    Set as relevant / irrelevant
-                </div>
-                <div class="row">
                     Create opposite transaction
                 </div>
                 <div class="row">
@@ -99,7 +96,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning btn-sm relevancy" onclick="change_relevancy_modal()">Set as relevant / irrelevant</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
             </div>
             </div>
         </div>

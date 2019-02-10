@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import Count, Sum, F, Q, DecimalField
 from django.db.models.functions import TruncMonth, Cast
+from django.http import JsonResponse
 
 from .models import Transaction
 
@@ -44,6 +45,18 @@ def get_monthly_review():
             up=Sum('amount', filter=Q(amount__gt=0)),
         )\
         .order_by('-month')
+
+
+def change_relevancy(request):
+    t_id = request.POST.get('t_id')
+    r_to_set = (request.POST.get('r_to_set') == 'true')
+
+    Transaction.objects.filter(id=t_id).update(irrelevant=r_to_set)
+
+    data = {
+        'r_set': r_to_set
+    }
+    return JsonResponse(data)
 
 
 def get_transactions_review(irrelevant='', account_id='', direction='', startDate='', endDate=''):
