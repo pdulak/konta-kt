@@ -7,6 +7,7 @@ from django.db.models.functions import TruncMonth, Cast
 from django.http import JsonResponse
 
 from .models import Transaction
+from accounts.models import Account
 
 
 def chk_date(date_text):
@@ -56,6 +57,49 @@ def change_relevancy(request):
     data = {
         'r_set': r_to_set
     }
+    return JsonResponse(data)
+
+
+def save(request):
+    t_id = request.POST.get('tr_id')
+
+    this_account = Account.objects.get(id=request.POST.get('tr_account'))
+
+    if int(t_id) > 0:
+        # update transaction
+        this_tr = Transaction.objects.filter(id=t_id).update(
+            account=this_account,
+            date=request.POST.get('tr_date'),
+            amount=request.POST.get('tr_amount'),
+            amount_account_currency=request.POST.get('tr_amount'),
+            currency_multiplier=1,
+            description=request.POST.get('tr_description'),
+            irrelevant=(request.POST.get('tr_irrelevant') == 'true')
+        )
+        data = {
+            't': t_id
+        }
+    else:
+        # new transaction
+        this_tr = Transaction.objects.create(
+            account=this_account,
+            date=request.POST.get('tr_date'),
+            added=date.today(),
+            amount=request.POST.get('tr_amount'),
+            balance=0,
+            amount_account_currency=request.POST.get('tr_amount'),
+            balance_account_currency=0,
+            currency_multiplier=1,
+            description=request.POST.get('tr_description'),
+            imported_description=request.POST.get('tr_description'),
+            type='Added manually',
+            irrelevant=(request.POST.get('tr_irrelevant') == 'true')
+        )
+        data = {
+            't': this_tr.id
+        }
+
+
     return JsonResponse(data)
 
 

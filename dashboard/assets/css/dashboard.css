@@ -137,6 +137,12 @@ body {
  * Data table
  */
 
+.btn-tr-add {
+    font-size: 100%;
+    padding: 2px 3px;
+    line-height: 100%;
+}
+
 #transactions_table tr td div.text-right {
     font-size: 70%;
 }

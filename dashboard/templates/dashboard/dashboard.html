@@ -19,7 +19,7 @@
             </div>
             {% if accounts_list %}
                 <div class="col">
-                    <select name="account" class="form-control form-control-sm">
+                    <select name="account" class="form-control form-control-sm" id="ft_account">
                         <option value="">Wszystkie konta</option>
                         {% for account in accounts_list %}
                             <option value="{{ account.account__id }}"> {{ account.account__bank__name }}: {{ account.account__name }} </option>
@@ -38,7 +38,7 @@
                 <input type="text" class="form-control form-control-sm" placeholder="do daty" name="endDate">
             </div>
             <div class="col">
-                <button onclick="load_transactions(); return false;" class="btn btn-primary btn-sm">&#x21bb;</button>
+                <button onclick="load_transactions(); load_months(); return false;" class="btn btn-primary btn-sm">&#x21bb;</button>
                 <button onclick="reset_filters(); return false;" class="btn btn-warning btn-sm">&#x274C;</button>
             </div>
         </div>
@@ -46,7 +46,7 @@
 {% endblock %}
 
 {% block transactions_review %}
-    <h3>Transactions</h3>
+    <h3>Transactions <button type="button" class="btn btn-warning btn-tr-add" onclick="transaction_menu(0);">&oplus;</button></h3>
 
     <div class="table-responsive">
         <table class="table table-striped table-sm" id="transactions_table">
@@ -68,21 +68,42 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Transaction menu</h5>
+                    <h5 class="modal-title" id="exampleModalLongTitle">Transaction edit</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
             <div class="modal-body">
-                <div class="row">
-                    Create opposite transaction
-                </div>
-                <div class="row">
-                    Edit transaction
-                </div>
+                <form name="transaction_edit">
+                    <input type="hidden" name="tr_id" value="">
+                    <div class="form-group">
+                        <label for="tr_account">Account</label>
+                        <select class="form-control form-control-sm" id="tr_account" name="tr_account"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tr_date">Date</label>
+                        <input type="date" class="form-control form-control-sm" id="tr_date" placeholder="Enter date" name="tr_date">
+                    </div>
+                    <div class="form-group">
+                        <label for="tr_amount">Amount</label>
+                        <input type="number" step="0.01" class="form-control form-control-sm" id="tr_amount" placeholder="Enter Amount" name="tr_amount">
+                    </div>
+                    <div class="form-group">
+                        <label for="tr_description">Description</label>
+                        <input type="text" class="form-control form-control-sm" id="tr_description" placeholder="Enter Description" name="tr_description">
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="tr_irrelevant" value="true" name="tr_irrelevant">
+                            <label class="form-check-label" for="tr_irrelevant">Irrelevant</label>
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-warning btn-sm relevancy" onclick="change_relevancy_modal()">Set as relevant / irrelevant</button>
+                <button type="button" class="btn btn-primary btn-sm tr-save" onclick="tr_save(false)">Save</button>
+                <button type="button" class="btn btn-warning btn-sm tr-save-as-new" onclick="tr_save(true)">Save as new</button>
+                <button type="button" class="btn btn-danger btn-sm relevancy" onclick="change_relevancy_modal()">Set as relevant / irrelevant</button>
                 <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
             </div>
             </div>

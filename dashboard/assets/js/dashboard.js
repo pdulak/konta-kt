@@ -90,6 +90,7 @@ function reset_filters() {
     document.filters.startDate.value = "";
     document.filters.endDate.value = "";
     load_transactions();
+    load_months();
 }
 
 function change_relevancy_modal() {
@@ -123,11 +124,58 @@ function transaction_menu(t_id) {
     $('#transactionsModal').modal();
     $('#transactionsModal').data('transaciton-id',t_id);
 
-    if (transactions[t_id].irrelevant) {
-        $('#transactionsModal .relevancy').html("Set as relevant");
+    // fill form
+    $('#tr_account').empty();
+    $('#ft_account option').clone().appendTo('#tr_account');
+    $('#tr_account option')[0].remove();
+
+    if (transactions[t_id]) {
+        $('#tr_account').val(transactions[t_id].account__id);
+        $('#tr_date').val(transactions[t_id].date);
+        $('#tr_amount').val(transactions[t_id].amount_account_currency);
+        $('#tr_description').val(transactions[t_id].description);
+        $('#tr_irrelevant').prop('checked', transactions[t_id].irrelevant);
+
+        if (transactions[t_id].irrelevant) {
+            $('#transactionsModal .relevancy').html("Set as relevant");
+        } else {
+            $('#transactionsModal .relevancy').html("Set as irrelevant");
+        }
+
+        $('#transactionsModal .relevancy').show();
+        $('#transactionsModal .tr-save').show();
     } else {
-        $('#transactionsModal .relevancy').html("Set as irrelevant");
+        $('#transactionsModal .relevancy').hide();
+        $('#transactionsModal .tr-save').hide();
     }
+}
+
+function tr_save(is_new) {
+    // ajax save transaction, update table
+    document.transaction_edit.tr_id.value = (is_new ? 0 : $('#transactionsModal').data('transaciton-id'));
+    data_to_send = $(document.transaction_edit).serialize();
+
+    $.ajax({
+        type: 'POST',
+        url: '/transactions/save/',
+        data: data_to_send,
+        success: function(data) {
+            $('#transactionsModal').modal('toggle');
+
+            if (data.t != $('#transactionsModal').data('transaciton-id')) {
+                // reload all
+            } else {
+                // update this transaction only
+            }
+
+            load_transactions();
+            load_months();
+        },
+        dataType: 'json',
+        failure: function(errMsg) {
+            alert(errMsg);
+        }
+    });
 }
 
 function set_click_on_months() {
