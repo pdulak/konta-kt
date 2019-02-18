@@ -7,8 +7,10 @@ from django.conf import settings
 
 
 def get_account_number(x):
-    account_number = x['destinationIBAN']
-    if x['Amount'] < 0:
+    account_number = '76249000050000400031886744'
+    if (x['Amount'] > 0) & (len(x['destinationIBAN']) > 20):
+        account_number = x['destinationIBAN']
+    if (x['Amount'] < 0) & (len(x['sourceIBAN']) > 20):
         account_number = x['sourceIBAN']
 
     return account_number.replace(' ', '')
@@ -70,7 +72,7 @@ def load_csv():
         df_temp['Party IBAN'] = df_temp.apply(get_party_iban, axis=1)
         df_temp['Party IBAN'] = df_temp['Party IBAN'].fillna('')
         df_temp['Account Number'] = df_temp.apply(get_account_number, axis=1)
-        df_temp['Account Number'] = df_temp['Account Number'].fillna('')
+        df_temp['Account Number'] = df_temp['Account Number'].fillna('76249000050000400031886744')
         df_temp['Date'] = df_temp['Date'].map(lambda x: '-'.join([x.split('-')[2], x.split('-')[1], x.split('-')[0]]))
         df_temp['Added'] = df_temp['Added'].map(lambda x: '-'.join([x.split('-')[2], x.split('-')[1], x.split('-')[0]]))
 
