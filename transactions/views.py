@@ -141,7 +141,8 @@ def get_transactions_review(irrelevant='', account_id='', direction='', startDat
         .select_related('bank') \
         .select_related('currency') \
         .select_related('category') \
-        .values('account', 'account__name', 'amount_account_currency', 'date', 'description', 'account__currency__name',
+        .values('account', 'account__name', 'amount_account_currency', 'date', 'description', 'party_name',
+                'account__currency__name',
                 'category__name', 'category__id', 'type', 'account__bank__name', 'irrelevant', 'id', 'account__id') \
         .order_by('-date', 'irrelevant', '-id')
 

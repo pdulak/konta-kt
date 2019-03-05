@@ -19,7 +19,7 @@ function fill_transaction_row(e, rowToFill) {
         transactionCell.style.color = '#aaa';
         transactionCell.setAttribute('data-irrelevant','1');
     }
-    transactionCell.innerHTML = e.description + '<div class="text-right">category: ' + e.category__name + '</div>' +
+    transactionCell.innerHTML = e.description + (e.party_name?' (' + e.party_name + ') ':'') + '<div class="text-right">category: ' + e.category__name + '</div>' +
             '<div class="text-right">account: ' + e.account__bank__name + ' - ' + e.account__name + '; type: ' + e.type + '</div>';
     rowToFill.appendChild(transactionCell);
 
