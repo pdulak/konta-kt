@@ -1,3 +1,4 @@
+import Alior
 import MBank
 import SeleniumDrivers
 import unittest
@@ -15,6 +16,7 @@ for SeleniumDrivers.current_driver in browsers:
 
     # add tests to the test suite
     suite.addTests(loader.loadTestsFromModule(MBank))
+    suite.addTests(loader.loadTestsFromModule(Alior))
 
     # initialize a runner, pass it your suite and run it
     runner = unittest.TextTestRunner(verbosity=3)

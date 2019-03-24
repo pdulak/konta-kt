@@ -25,7 +25,7 @@ class MBank(unittest.TestCase):
     def test_mBank_login(self):
         driver = self.driver
         elem = driver.find_element_by_name("userID")
-        elem.send_keys(SeleniumDrivers.user_name)
+        elem.send_keys(SeleniumDrivers.mbank_user_name)
         elem = driver.find_element_by_name("pass")
         elem.send_keys(SeleniumDrivers.user_pass)
         driver.find_element_by_id("submitButton").click()
@@ -88,5 +88,5 @@ class MBank(unittest.TestCase):
 
     @classmethod
     def tearDownClass(self):
-        # self.driver.close()
+        self.driver.close()
         1
