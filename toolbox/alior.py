@@ -8,9 +8,9 @@ from django.conf import settings
 
 def get_account_number(x):
     account_number = '76249000050000400031886744'
-    if (x['Amount'] > 0) & (len(x['destinationIBAN']) > 20):
+    if (float(x['Amount']) > 0) & (len(x['destinationIBAN']) > 20):
         account_number = x['destinationIBAN']
-    if (x['Amount'] < 0) & (len(x['sourceIBAN']) > 20):
+    if (float(x['Amount']) < 0) & (len(x['sourceIBAN']) > 20):
         account_number = x['sourceIBAN']
 
     return account_number.replace(' ', '')
@@ -18,7 +18,7 @@ def get_account_number(x):
 
 def get_party_iban(x):
     account_number = x['destinationIBAN']
-    if x['Amount'] > 0:
+    if float(x['Amount']) > 0:
         account_number = x['sourceIBAN']
 
     return account_number.replace(' ', '')
@@ -26,7 +26,7 @@ def get_party_iban(x):
 
 def get_party_name(x):
     party_name = x['Destination']
-    if x['Amount'] > 0:
+    if float(x['Amount']) > 0:
         party_name = x['Source Party']
 
     return party_name
@@ -67,6 +67,7 @@ def load_csv():
         df_temp['Description'] = df_temp['Description'].fillna('')
         df_temp['Type'] = 'Alior NA'
 
+        df_temp['Amount'] = df_temp['Amount'].map(lambda x: x.replace(",", "."))
         df_temp['Party Name'] = df_temp.apply(get_party_name, axis=1)
         df_temp['Party Name'] = df_temp['Party Name'].fillna('')
         df_temp['Party IBAN'] = df_temp.apply(get_party_iban, axis=1)
