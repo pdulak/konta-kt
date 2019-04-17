@@ -1,7 +1,9 @@
 # SeleniumDrivers module
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-
+import sys
+import os
+sys.path.insert(0, os.getcwd()) # workaround to import kontaKt settings
 from kontaKt import privateSettings
 
 current_driver = "Chrome"
