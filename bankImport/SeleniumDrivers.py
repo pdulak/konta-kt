@@ -2,9 +2,11 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
+from kontaKt import privateSettings
+
 current_driver = "Chrome"
-mbank_user_name = "mbank_user_name_here"
-alior_user_name = "alior_user_name_here"
+mbank_user_name = privateSettings.mbank_user_name
+alior_user_name = privateSettings.alior_user_name
 user_pass = ""
 
 def load_driver(download_dir=None):

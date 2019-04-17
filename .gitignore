@@ -92,3 +92,6 @@ local_settings.py
 temp/*
 .idea/*
 venv/*
+
+### my own ###
+kontaKt/privateSettings.py
