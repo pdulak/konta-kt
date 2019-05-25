@@ -46,6 +46,7 @@ class Transaction(models.Model):
     party_name = models.CharField(max_length=500, blank=True, null=True)
     party_IBAN = models.CharField(max_length=200, blank=True, null=True)
     irrelevant = models.BooleanField(default=False, blank=True, null=True)
+    approved = models.BooleanField(default=False, blank=True, null=True)
 
     def __str__(self):
         return self.description + '; ' + self.imported_description + '; ' + str(self.date) + '; ' + str(self.amount) \

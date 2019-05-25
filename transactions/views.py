@@ -60,6 +60,18 @@ def change_relevancy(request):
     return JsonResponse(data)
 
 
+def change_approval(request):
+    t_id = request.POST.get('t_id')
+    a_to_set = (request.POST.get('a_to_set') == 'true')
+
+    Transaction.objects.filter(id=t_id).update(approved=a_to_set)
+
+    data = {
+        'a_set': a_to_set
+    }
+    return JsonResponse(data)
+
+
 def save(request):
     t_id = request.POST.get('tr_id')
 
@@ -142,7 +154,7 @@ def get_transactions_review(irrelevant='', account_id='', direction='', startDat
         .select_related('currency') \
         .select_related('category') \
         .values('account', 'account__name', 'amount_account_currency', 'date', 'description', 'party_name',
-                'account__currency__name',
+                'account__currency__name', 'approved',
                 'category__name', 'category__id', 'type', 'account__bank__name', 'irrelevant', 'id', 'account__id') \
         .order_by('-date', 'irrelevant', '-id')
 

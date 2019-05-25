@@ -26,7 +26,13 @@ function fill_transaction_row(e, rowToFill) {
     // amount
     amountCell = document.createElement("td");
     amountCell.setAttribute('class','text-right');
+    if (!e.approved) {
+        amountCell.setAttribute('class','text-right not-approved');
+    }
     amountCell.innerHTML = e.amount_account_currency + ' ' + e.account__currency__name;
+    if (!e.approved) {
+        amountCell.innerHTML += '<button onclick="change_approval(' + e.id + '); return false;" class="btn btn-warning btn-sm">&#10004;</button>';
+    }
     rowToFill.appendChild(amountCell);
 
     return rowToFill;
@@ -216,6 +222,27 @@ function load_months() {
     })
 
 
+}
+
+function change_approval(t_id) {
+    if (transactions[t_id]) {
+        $.ajax({
+            type: 'POST',
+            url: '/transactions/change_approval/',
+            data: { 't_id' : t_id,
+                    'a_to_set' : ! transactions[t_id].approved },
+            success: function(data) {
+                transactions[t_id].approved = data.a_set;
+                thisRow = $('tr[data-transaction-id=' + t_id + ']');
+                thisRow.empty();
+                thisRow = fill_transaction_row(transactions[t_id], thisRow[0]);
+            },
+            dataType: 'json',
+            failure: function(errMsg) {
+                alert(errMsg);
+            }
+        });
+    }
 }
 
 var transactions = [];
