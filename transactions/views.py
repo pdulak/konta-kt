@@ -34,7 +34,7 @@ def get_account_balance():
         .annotate(
             ttotal=Cast('total', DecimalField(max_digits=14, decimal_places=2)),
         ) \
-        .order_by('account__bank__hide', 'account__bank__name', 'account')
+        .order_by('account__bank__hide', 'account__bank__name', 'account__name', 'account')
 
 
 def get_monthly_review():
