@@ -15,11 +15,11 @@ def index(request):
 
 def j_transactions(request):
     transactions_query, filter_start_date, filter_end_date = get_transactions_review(irrelevant=request.POST.get('irrelevant'),
-                                                          account_id=request.POST.get('account'),
-                                                          direction=request.POST.get('direction'),
-                                                          startDate=request.POST.get('startDate'),
-                                                          endDate=request.POST.get('endDate'),
-                                                          sortOrder=request.POST.get('sortOrder'))
+                                                                                     account_id=request.POST.get('account'),
+                                                                                     direction=request.POST.get('direction'),
+                                                                                     start_date=request.POST.get('startDate'),
+                                                                                     end_date=request.POST.get('endDate'),
+                                                                                     sort_order=request.POST.get('sortOrder'))
     data = {
         'transactions_list': list(transactions_query),
         'startDate': filter_start_date,

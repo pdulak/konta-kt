@@ -115,7 +115,7 @@ def save(request):
     return JsonResponse(data)
 
 
-def get_transactions_review(irrelevant='', account_id='', direction='', startDate='', endDate='', sortOrder=''):
+def get_transactions_review(irrelevant='', account_id='', direction='', start_date='', end_date='', sort_order=''):
     t = Transaction.objects
 
     # relevancy filter
@@ -135,25 +135,25 @@ def get_transactions_review(irrelevant='', account_id='', direction='', startDat
         t = t.filter(amount_account_currency__lte=0)
 
     # check date fields, set minimum and maximum date properly
-    if chk_date(startDate):
-        filter_start_date = datetime.strptime(startDate, "%Y-%m-%d")
+    if chk_date(start_date):
+        filter_start_date = datetime.strptime(start_date, "%Y-%m-%d")
     else:
         d = date.today() - relativedelta(months=1)
         filter_start_date = date(d.year, d.month, 1)
 
-    if chk_date(endDate):
-        filter_end_date = datetime.strptime(endDate, "%Y-%m-%d")
+    if chk_date(end_date):
+        filter_end_date = datetime.strptime(end_date, "%Y-%m-%d")
     else:
         filter_end_date = date.today()
 
     t = t.filter(date__gte=filter_start_date).filter(date__lte=filter_end_date)
 
     ordering = ['-date', 'irrelevant', '-id']
-    if sortOrder == 'date':
+    if sort_order == 'date':
         ordering = ['date', 'irrelevant', '-id']
-    elif sortOrder == 'amount':
+    elif sort_order == 'amount':
         ordering = ['amount_account_currency', '-date', 'irrelevant', '-id']
-    elif sortOrder == '-amount':
+    elif sort_order == '-amount':
         ordering = ['-amount_account_currency', '-date', 'irrelevant', '-id']
 
     # the query itself
