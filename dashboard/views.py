@@ -18,7 +18,8 @@ def j_transactions(request):
                                                           account_id=request.POST.get('account'),
                                                           direction=request.POST.get('direction'),
                                                           startDate=request.POST.get('startDate'),
-                                                          endDate=request.POST.get('endDate'))
+                                                          endDate=request.POST.get('endDate'),
+                                                          sortOrder=request.POST.get('sortOrder'))
     data = {
         'transactions_list': list(transactions_query),
         'startDate': filter_start_date,

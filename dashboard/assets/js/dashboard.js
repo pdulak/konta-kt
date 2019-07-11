@@ -42,6 +42,7 @@ function fill_transactions(data) {
     var bodyToFill = $('#transactions_table tbody');
     var lastDate;
     var t = data.transactions_list;
+    var divideDates = (document.filters.sortOrder.value == 'date' || document.filters.sortOrder.value == '-date');
 
     document.filters.startDate.value = data.startDate;
     document.filters.endDate.value = data.endDate;
@@ -54,7 +55,9 @@ function fill_transactions(data) {
         thisRow = document.createElement("tr");
         thisRow.setAttribute('data-transaction-id', e.id);
         if (lastDate != e.date) {
-            thisRow.style.borderTop = "4px solid black";
+            if (divideDates) {
+                thisRow.style.borderTop = "4px solid black";
+            }
             lastDate = e.date;
         }
 
@@ -250,4 +253,28 @@ var transactions = [];
 $(function(){
     load_transactions();
     load_months();
+
+    $('#transactions_table .date-header').on("click",function(){
+        $('#transactions_table th').removeClass('activeUp').removeClass('activeDown');
+        if (document.filters.sortOrder.value == '-date') {
+            document.filters.sortOrder.value = 'date';
+            $('#transactions_table .date-header').addClass('activeDown');
+        } else {
+            document.filters.sortOrder.value = '-date';
+            $('#transactions_table .date-header').addClass('activeUp');
+        }
+        load_transactions();
+    });
+
+    $('#transactions_table .amount-header').on("click",function(){
+        $('#transactions_table th').removeClass('activeUp').removeClass('activeDown');
+        if (document.filters.sortOrder.value == 'amount') {
+            document.filters.sortOrder.value = '-amount';
+            $('#transactions_table .amount-header').addClass('activeUp');
+        } else {
+            document.filters.sortOrder.value = 'amount';
+            $('#transactions_table .amount-header').addClass('activeDown');
+        }
+        load_transactions();
+    });
 });

@@ -115,7 +115,7 @@ def save(request):
     return JsonResponse(data)
 
 
-def get_transactions_review(irrelevant='', account_id='', direction='', startDate='', endDate=''):
+def get_transactions_review(irrelevant='', account_id='', direction='', startDate='', endDate='', sortOrder=''):
     t = Transaction.objects
 
     # relevancy filter
@@ -148,6 +148,14 @@ def get_transactions_review(irrelevant='', account_id='', direction='', startDat
 
     t = t.filter(date__gte=filter_start_date).filter(date__lte=filter_end_date)
 
+    ordering = ['-date', 'irrelevant', '-id']
+    if sortOrder == 'date':
+        ordering = ['date', 'irrelevant', '-id']
+    elif sortOrder == 'amount':
+        ordering = ['amount_account_currency', '-date', 'irrelevant', '-id']
+    elif sortOrder == '-amount':
+        ordering = ['-amount_account_currency', '-date', 'irrelevant', '-id']
+
     # the query itself
     t = t.select_related('account') \
         .select_related('bank') \
@@ -156,7 +164,7 @@ def get_transactions_review(irrelevant='', account_id='', direction='', startDat
         .values('account', 'account__name', 'amount_account_currency', 'date', 'description', 'party_name',
                 'account__currency__name', 'approved',
                 'category__name', 'category__id', 'type', 'account__bank__name', 'irrelevant', 'id', 'account__id') \
-        .order_by('-date', 'irrelevant', '-id')
+        .order_by(*ordering)
 
     return t, filter_start_date.strftime('%Y-%m-%d'), filter_end_date.strftime('%Y-%m-%d')
 

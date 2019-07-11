@@ -169,6 +169,19 @@ body {
     display: block;
 }
 
+#transactions_table th.date-header,
+#transactions_table th.amount-header {
+    cursor: pointer;
+}
+
+#transactions_table th.activeUp:after {
+    content: '\021E7';
+}
+
+#transactions_table th.activeDown:after {
+    content: '\021E9';
+}
+
 /*
  * Accounts accordion
  */

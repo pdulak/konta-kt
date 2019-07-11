@@ -30,15 +30,15 @@ class MBank(unittest.TestCase):
         elem.send_keys(SeleniumDrivers.user_pass)
         driver.find_element_by_id("submitButton").click()
         # switch to full history
-        element = WebDriverWait(driver, 5).until(
+        element = WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, "full-history"))
         )
         element.click()
         # switch to the other view
-        WebDriverWait(driver, 10).until(
+        WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, "transactionListContainer"))
         )
-        element = WebDriverWait(driver, 10).until(
+        element = WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Zmień widok')]"))
         )
         element.click()
@@ -46,7 +46,7 @@ class MBank(unittest.TestCase):
         # switch to iFrame
         driver.get("https://online.mbank.pl/csite/account_oper_list.aspx")
         # wait for select
-        accountsCombo = WebDriverWait(driver, 5).until(
+        accountsCombo = WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, "MenuAccountsCombo"))
         )
 
@@ -67,7 +67,7 @@ class MBank(unittest.TestCase):
         format_options[2].click()
 
         # loop by accounts, get CSV
-        accountsCombo = WebDriverWait(driver, 5).until(
+        accountsCombo = WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, "MenuAccountsCombo"))
         )
         accounts = [x for x in accountsCombo.find_elements_by_tag_name("option")]
