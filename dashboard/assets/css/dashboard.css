@@ -174,6 +174,11 @@ body {
     cursor: pointer;
 }
 
+#transactions_table th.activeUp,
+#transactions_table th.activeDown {
+    background-color: #ffc107;
+}
+
 #transactions_table th.activeUp:after {
     content: '\021E7';
 }
