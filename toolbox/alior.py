@@ -8,9 +8,9 @@ from django.conf import settings
 
 def get_account_number(x):
     account_number = '76249000050000400031886744'
-    if (float(x['Amount']) > 0) & (len(x['destinationIBAN']) > 20):
+    if (float(x['Amount']) > 0) and (len(x['destinationIBAN']) > 20):
         account_number = x['destinationIBAN']
-    if (float(x['Amount']) < 0) & (len(x['sourceIBAN']) > 20):
+    if (float(x['Amount']) < 0) and (len(x['sourceIBAN']) > 20):
         account_number = x['sourceIBAN']
 
     return account_number.replace(' ', '')

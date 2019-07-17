@@ -25,7 +25,7 @@ def do_import(df):
                     import_headers[row['Source']] = ImportHeader.objects.create(
                         source=row['Source'], date=datetime.datetime.now())
 
-                if (last_source != row['Source']) | (last_account != row['Account Number']):
+                if (last_source != row['Source']) or (last_account != row['Account Number']):
                     last_source = row['Source']
                     last_account = row['Account Number']
                     print(datetime.datetime.now(), ' importing ', last_account, '; ', last_source)

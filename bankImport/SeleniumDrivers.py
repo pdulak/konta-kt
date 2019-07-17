@@ -28,7 +28,7 @@ def load_chrome(download_dir=None):
     options = Options()
     options.add_argument("--start-maximized")
 
-    if download_dir is not None:
+    if download_dir:
         prefs = {"download.default_directory": download_dir}
         options.add_experimental_option("prefs", prefs)
 
