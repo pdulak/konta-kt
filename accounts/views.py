@@ -3,9 +3,6 @@ from django.http import Http404
 
 from .models import Account, Bank
 
-# Create your views here.
-
-from django.http import HttpResponse
 
 def index(request):
     latest_accounts_list = Account.objects.order_by('-id')[:5]
@@ -16,12 +13,14 @@ def index(request):
     }
     return render(request, 'accounts/index.html', context)
 
+
 def account_detail(request, account_id):
     try:
         account = Account.objects.get(pk=account_id)
     except Account.DoesNotExist:
         raise Http404("Account does not exist")
     return render(request, 'accounts/account_detail.html', {'account': account})
+
 
 def bank_detail(request, bank_id):
     bank = get_object_or_404(Bank, pk=bank_id)

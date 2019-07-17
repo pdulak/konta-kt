@@ -31,12 +31,12 @@ def trim_text_fields(x):
 
 def load_csv():
     # load all csv files from temp dir
-    sourceDir = os.path.join(settings.BASE_DIR, 'temp')
+    source_dir = os.path.join(settings.BASE_DIR, 'temp')
     field_names = ['Date', 'Added', 'Type', 'Description', 'Party Name', 'Party IBAN', 'Amount', 'Balance',
                    'Account Number']
     df = pd.DataFrame()
 
-    list_of_files = glob.glob(os.path.join(sourceDir, '*.csv'))
+    list_of_files = glob.glob(os.path.join(source_dir, '*.csv'))
     for this_file in list_of_files:
         print('adding: ', this_file)
         this_account_number = ''
@@ -62,9 +62,6 @@ def load_csv():
         df_temp = pd.read_csv(pd.compat.StringIO(this_data), sep=';', comment='#', engine='python', names=field_names,
                               quotechar='|', encoding='cp1250', dtype={'Party IBAN': 'str'})
 
-        # pd.set_option('display.max_columns', None)
-        # print(df_temp.head(10))
-
         df_temp['Account Number'] = this_account_number
         df_temp['Source'] = os.path.basename(this_file)
         df_temp['Description'] = df_temp['Description'].fillna('')
@@ -89,12 +86,4 @@ def load_csv():
     print("Whole dataframe shape: ", df.shape)
     print(df.info())
 
-    # print(df["Party IBAN"].value_counts())
-
-    # pd.set_option('display.max_columns', None)
-    # print(df.sample(10))
-
     return df
-
-
-

@@ -25,25 +25,21 @@ def get_party_iban(x):
 
 
 def get_party_name(x):
-    party_name = x['Destination']
     if float(x['Amount']) > 0:
-        party_name = x['Source Party']
+        return x['Source Party']
 
-    return party_name
+    return x['Destination']
 
 
 def load_csv():
     # load all csv files from temp dir
-    sourceDir = os.path.join(settings.BASE_DIR, 'temp', 'alior')
+    source_dir = os.path.join(settings.BASE_DIR, 'temp', 'alior')
     field_names = ['Date', 'Added', 'Source Party', 'Destination', 'Description', 'Amount', 'Currency', 'AmountAccount',
                    'CurrencyAccount', 'sourceIBAN', 'destinationIBAN', 'none']
     df = pd.DataFrame()
 
-    first_one = re.compile(r'^"')
-    last_one = re.compile(r'"$')
-
-    list_of_files = glob.glob(os.path.join(sourceDir, '*.csv'))
-    list_of_files += glob.glob(os.path.join(sourceDir, '*.CSV'))
+    list_of_files = glob.glob(os.path.join(source_dir, '*.csv'))
+    list_of_files += glob.glob(os.path.join(source_dir, '*.CSV'))
 
     for this_file in list_of_files:
         print('adding: ', this_file)
@@ -89,10 +85,5 @@ def load_csv():
 
     print("Whole dataframe shape: ", df.shape)
     print(df.info())
-
-    # print(df["Party IBAN"].value_counts())
-
-    # pd.set_option('display.max_columns', None)
-    # print(df.head(6))
 
     return df

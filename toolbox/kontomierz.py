@@ -61,16 +61,16 @@ def do_initial_load(df):
         data_transakcji = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0]
         dateParts = row['DataKsiegowania'].split('-')
         data_ksiegowania = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0]
-        this_transaction, created = Transaction.objects.get_or_create(account=this_account, category=this_cat,
-                                                                      uuid_text=row['UID'], date=data_transakcji,
-                                                                      added=data_ksiegowania,
-                                                                      amount=row['Kwota'].replace(',','.'),
-                                                                      balance=row['Saldo'].replace(',','.'),
-                                                                      description=row['Opis'],
-                                                                      imported_description=row['Tytul'],
-                                                                      type=row['Rodzaj'], party_name=row['Strona'],
-                                                                      party_IBAN=row['IBANStrony'],
-                                                                      irrelevant=(True if row['Nieistotna'] == 'nieistotna' else False)
-                                                                      )
+        Transaction.objects.get_or_create(account=this_account, category=this_cat,
+                                                      uuid_text=row['UID'], date=data_transakcji,
+                                                      added=data_ksiegowania,
+                                                      amount=row['Kwota'].replace(',','.'),
+                                                      balance=row['Saldo'].replace(',','.'),
+                                                      description=row['Opis'],
+                                                      imported_description=row['Tytul'],
+                                                      type=row['Rodzaj'], party_name=row['Strona'],
+                                                      party_IBAN=row['IBANStrony'],
+                                                      irrelevant=(True if row['Nieistotna'] == 'nieistotna' else False)
+                                                      )
 
     return True

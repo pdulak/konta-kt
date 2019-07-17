@@ -11,11 +11,12 @@ mbank_user_name = privateSettings.mbank_user_name
 alior_user_name = privateSettings.alior_user_name
 user_pass = ""
 
+
 def load_driver(download_dir=None):
     if current_driver == "Chrome":
         return load_chrome(download_dir)
-    else:
-        return load_firefox(download_dir)
+    return load_firefox(download_dir)
+
 
 def load_firefox(download_dir=None):
     driver = webdriver.Firefox()

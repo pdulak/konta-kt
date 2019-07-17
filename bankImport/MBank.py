@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
+
 class MBank(unittest.TestCase):
 
     @classmethod
@@ -46,7 +47,7 @@ class MBank(unittest.TestCase):
         # switch to iFrame
         driver.get("https://online.mbank.pl/csite/account_oper_list.aspx")
         # wait for select
-        accountsCombo = WebDriverWait(driver, 15).until(
+        WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, "MenuAccountsCombo"))
         )
 
@@ -67,20 +68,19 @@ class MBank(unittest.TestCase):
         format_options[2].click()
 
         # loop by accounts, get CSV
-        accountsCombo = WebDriverWait(driver, 15).until(
+        accounts_combo = WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, "MenuAccountsCombo"))
         )
-        accounts = [x for x in accountsCombo.find_elements_by_tag_name("option")]
+        accounts = [x for x in accounts_combo.find_elements_by_tag_name("option")]
         number_of_accounts = len(accounts)
 
         for i in range(0, number_of_accounts):
-            accountsCombo = driver.find_element_by_id("MenuAccountsCombo")
-            accountsCombo.click()
-            accounts = [x for x in accountsCombo.find_elements_by_tag_name("option")]
+            accounts_combo = driver.find_element_by_id("MenuAccountsCombo")
+            accounts_combo.click()
+            accounts = [x for x in accounts_combo.find_elements_by_tag_name("option")]
             accounts[i].click()
             driver.find_element_by_id("Submit").click()
             time.sleep(1)
-
 
     def tearDown(self):
         # nothing to do

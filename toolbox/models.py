@@ -6,4 +6,4 @@ class ImportHeader(models.Model):
     date = models.DateField()
 
     def __str__(self):
-        return self.source + '; ' + str(self.date)
+        return '{}; {}'.format(self.source, str(self.date))
