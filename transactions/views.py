@@ -1,8 +1,7 @@
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from django.shortcuts import render
-from django.http import HttpResponse
-from django.db.models import Count, Sum, F, Q, DecimalField
+from django.db.models import Sum, Q, DecimalField
 from django.db.models.functions import TruncMonth, Cast
 from django.http import JsonResponse
 
@@ -115,45 +114,46 @@ def save(request):
     return JsonResponse(data)
 
 
-def get_transactions_review(irrelevant='', account_id='', direction='', start_date='', end_date='', sort_order=''):
+def get_transactions_review(irrelevant, account_id, direction, start_date,
+                            end_date, sort_order):
     t = Transaction.objects
 
     # relevancy filter
-    if irrelevant == 'T':
+    if irrelevant[0] == 'T':
         t = t.filter(irrelevant=1)
-    elif irrelevant == 'F':
+    elif irrelevant[0] == 'F':
         t = t.filter(irrelevant=0)
 
     # account filter
-    if account_id.isdigit():
+    if account_id[0].isdigit():
         t = t.filter(account__id=account_id)
 
     # direction filter
-    if direction == 'I':
+    if direction[0] == 'I':
         t = t.filter(amount_account_currency__gte=0)
-    elif direction == 'O':
+    elif direction[0] == 'O':
         t = t.filter(amount_account_currency__lte=0)
 
     # check date fields, set minimum and maximum date properly
-    if chk_date(start_date):
-        filter_start_date = datetime.strptime(start_date, "%Y-%m-%d")
+    if chk_date(start_date[0]):
+        filter_start_date = datetime.strptime(start_date[0], "%Y-%m-%d")
     else:
         d = date.today() - relativedelta(months=1)
         filter_start_date = date(d.year, d.month, 1)
 
-    if chk_date(end_date):
-        filter_end_date = datetime.strptime(end_date, "%Y-%m-%d")
+    if chk_date(end_date[0]):
+        filter_end_date = datetime.strptime(end_date[0], "%Y-%m-%d")
     else:
         filter_end_date = date.today()
 
     t = t.filter(date__gte=filter_start_date).filter(date__lte=filter_end_date)
 
     ordering = ['-date', 'irrelevant', '-id']
-    if sort_order == 'date':
+    if sort_order[0] == 'date':
         ordering = ['date', 'irrelevant', '-id']
-    elif sort_order == 'amount':
+    elif sort_order[0] == 'amount':
         ordering = ['amount_account_currency', '-date', 'irrelevant', '-id']
-    elif sort_order == '-amount':
+    elif sort_order[0] == '-amount':
         ordering = ['-amount_account_currency', '-date', 'irrelevant', '-id']
 
     # the query itself
@@ -169,10 +169,6 @@ def get_transactions_review(irrelevant='', account_id='', direction='', start_da
     return t, filter_start_date.strftime('%Y-%m-%d'), filter_end_date.strftime('%Y-%m-%d')
 
 
-def index(request):
-    return HttpResponse("Hello, world. You're at the transactions index.")
-
-
 def monthly_review(request):
     context = {
         'months_list': get_monthly_review(),
@@ -185,13 +181,6 @@ def account_balance(request):
         'accounts_list': get_account_balance(),
     }
     return render(request, 'transactions/account_balance.html', context)
-
-
-def transactions_review(request):
-    context = {
-        'transactions_list': get_transactions_review()[:500],
-    }
-    return render(request, 'transactions/transactions_review.html', context)
 
 
 def months(request):

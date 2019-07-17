@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.http import JsonResponse
 
 from transactions.views import get_account_balance, get_monthly_review, get_transactions_review
@@ -14,15 +13,10 @@ def index(request):
 
 
 def j_transactions(request):
-    transactions_query, filter_start_date, filter_end_date = get_transactions_review(irrelevant=request.POST.get('irrelevant'),
-                                                                                     account_id=request.POST.get('account'),
-                                                                                     direction=request.POST.get('direction'),
-                                                                                     start_date=request.POST.get('startDate'),
-                                                                                     end_date=request.POST.get('endDate'),
-                                                                                     sort_order=request.POST.get('sortOrder'))
+    transactions_query, filter_start_date, filter_end_date = get_transactions_review(**request.POST)
     data = {
         'transactions_list': list(transactions_query),
-        'startDate': filter_start_date,
-        'endDate': filter_end_date
+        'start_date': filter_start_date,
+        'end_date': filter_end_date
     }
     return JsonResponse(data)

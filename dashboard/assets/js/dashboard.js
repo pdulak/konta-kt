@@ -42,10 +42,10 @@ function fill_transactions(data) {
     var bodyToFill = $('#transactions_table tbody');
     var lastDate;
     var t = data.transactions_list;
-    var divideDates = (document.filters.sortOrder.value == 'date' || document.filters.sortOrder.value == '-date');
+    var divideDates = (document.filters.sort_order.value == 'date' || document.filters.sort_order.value == '-date');
 
-    document.filters.startDate.value = data.startDate;
-    document.filters.endDate.value = data.endDate;
+    document.filters.start_date.value = data.start_date;
+    document.filters.end_date.value = data.end_date;
 
     bodyToFill.empty();
     transactions = [];
@@ -96,8 +96,8 @@ function reset_filters() {
     if (document.filters.account.tagName == "SELECT") {
         document.filters.account.selectedIndex = 0;
     }
-    document.filters.startDate.value = "";
-    document.filters.endDate.value = "";
+    document.filters.start_date.value = "";
+    document.filters.end_date.value = "";
     load_transactions();
     load_months();
 }
@@ -194,8 +194,8 @@ function set_click_on_months() {
         firstDay = new Date(dateArr[0], dateArr[1]-1, 1);
         lastDay = new Date(dateArr[0], dateArr[1], 0);
         // fill
-        document.filters.startDate.value = firstDay.yyyymmdd();
-        document.filters.endDate.value = lastDay.yyyymmdd();
+        document.filters.start_date.value = firstDay.yyyymmdd();
+        document.filters.end_date.value = lastDay.yyyymmdd();
         // execute reload
         load_transactions();
     });
@@ -256,11 +256,11 @@ $(function(){
 
     $('#transactions_table .date-header').on("click",function(){
         $('#transactions_table th').removeClass('activeUp').removeClass('activeDown');
-        if (document.filters.sortOrder.value == '-date') {
-            document.filters.sortOrder.value = 'date';
+        if (document.filters.sort_order.value == '-date') {
+            document.filters.sort_order.value = 'date';
             $('#transactions_table .date-header').addClass('activeDown');
         } else {
-            document.filters.sortOrder.value = '-date';
+            document.filters.sort_order.value = '-date';
             $('#transactions_table .date-header').addClass('activeUp');
         }
         load_transactions();
@@ -268,11 +268,11 @@ $(function(){
 
     $('#transactions_table .amount-header').on("click",function(){
         $('#transactions_table th').removeClass('activeUp').removeClass('activeDown');
-        if (document.filters.sortOrder.value == 'amount') {
-            document.filters.sortOrder.value = '-amount';
+        if (document.filters.sort_order.value == 'amount') {
+            document.filters.sort_order.value = '-amount';
             $('#transactions_table .amount-header').addClass('activeUp');
         } else {
-            document.filters.sortOrder.value = 'amount';
+            document.filters.sort_order.value = 'amount';
             $('#transactions_table .amount-header').addClass('activeDown');
         }
         load_transactions();
