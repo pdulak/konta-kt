@@ -77,7 +77,7 @@ def save(request):
 
     this_account = Account.objects.get(id=request.POST.get('tr_account'))
 
-    if int(t_id) > 0:
+    if int(t_id):
         # update transaction
         this_tr = Transaction.objects.filter(id=t_id).update(
             account=this_account,

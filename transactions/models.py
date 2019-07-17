@@ -49,8 +49,9 @@ class Transaction(models.Model):
     approved = models.BooleanField(default=False, blank=True, null=True)
 
     def __str__(self):
-        return self.description + '; ' + self.imported_description + '; ' + str(self.date) + '; ' + str(self.amount) \
-               + ' PLN; ' + str(self.amount_account_currency) + ' ' + str(self.account.currency.name)
+        return '{}; {}; {}; {} PLN; {} {}'.format(self.description, self.imported_description, str(self.date),
+                                                   str(self.amount), str(self.amount_account_currency),
+                                                   str(self.account.currency.name))
 
 
 class TransactionImportTemp(models.Model):
@@ -71,4 +72,5 @@ class TransactionImportTemp(models.Model):
     is_duplicate = models.BooleanField(default=False, blank=True, null=True)
 
     def __str__(self):
-        return self.imported_description + '; ' + str(self.date) + '; ' + str(self.amount) + ' PLN; ' + str(self.amount_account_currency) + ' ' + str(self.account.currency.name)
+        return '{}; {}; {} PLN; {} {}'.format(self.imported_description, str(self.date), str(self.amount),
+                                              str(self.amount_account_currency), str(self.account.currency.name))

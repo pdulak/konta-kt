@@ -13,7 +13,7 @@ def do_import(df):
     last_source = ''
     last_account = ''
 
-    if numbered_accounts.count() > 0:
+    if numbered_accounts.count():
         # prepare dictionary of account numbers
         for a in numbered_accounts:
             accounts_numbers[a.number.replace(' ', '')] = a
@@ -40,7 +40,7 @@ def do_import(df):
                                                              imported_description__contains=row['Description']
                                                              ).count()
 
-                if chk_transaction > 0:
+                if chk_transaction:
                     is_duplicate = True
                 else:
                     # insert if not duplicate
