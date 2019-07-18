@@ -152,9 +152,9 @@ def get_transactions_review(irrelevant, account_id, direction, start_date,
     if sort_order[0] == 'date':
         ordering = ['date', 'irrelevant', '-id']
     elif sort_order[0] == 'amount':
-        ordering = ['amount_account_currency', '-date', 'irrelevant', '-id']
+        ordering = ['amount', '-date', 'irrelevant', '-id']
     elif sort_order[0] == '-amount':
-        ordering = ['-amount_account_currency', '-date', 'irrelevant', '-id']
+        ordering = ['-amount', '-date', 'irrelevant', '-id']
 
     # the query itself
     t = t.select_related('account') \
