@@ -3,10 +3,8 @@ import urllib3
 import json
 from datetime import datetime, timedelta
 from loguru import logger
-
-# get table from the particular date
-# if there is an error, get from the earlier date, limit to 14 days back
-# if no error, find particular currency
+from transactions.models import Transaction
+from decimal import Decimal
 
 # find all transactions in currency other than PLN
 # check if the rate is set
@@ -51,3 +49,39 @@ def get_nbp_rate_table_a_with_backtrack(date_to_get=datetime.now(), currency_cod
             return result
 
     return False
+
+
+def check_non_pln_transactions():
+    """Check the transactions in currencies other than PLN and adjusts the rate"""
+
+    # get the transactions list to update (non-PLN, currency multiplier not set)
+    t = Transaction.objects
+    t = t.select_related('account') \
+        .select_related('bank') \
+        .select_related('currency') \
+        .exclude(account__currency__name='PLN') \
+        .filter(currency_multiplier=1) \
+        .values('id', 'account__currency__name') \
+        .order_by('date')
+
+    logger.info("Found {} transactions to update".format(t.count()))
+
+    # update one by one
+    for tt in t:
+        adjust_non_pln_transaction_rate(tt['id'], tt['account__currency__name'])
+
+    return t.count()
+
+
+def adjust_non_pln_transaction_rate(transaction_id, currency_code):
+    """Adjust non-PLN transaction to set proper rate and values"""
+
+    this_transaction = Transaction.objects.get(pk=transaction_id)
+    logger.info("Updating {}".format(this_transaction))
+    rate_to_set = get_nbp_rate_table_a_with_backtrack(this_transaction.date, currency_code)
+    if rate_to_set:
+        logger.info("rate for this transaction: {}".format(rate_to_set))
+        this_transaction.currency_multiplier = Decimal(rate_to_set)
+        this_transaction.amount = this_transaction.amount_account_currency * Decimal(rate_to_set)
+        logger.info("new transaction values: {}".format(this_transaction))
+        this_transaction.save()

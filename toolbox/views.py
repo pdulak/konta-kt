@@ -80,6 +80,5 @@ def load_alior(request):
     return HttpResponse("Loaded Alior CSV;")
 
 
-def test_nbp(request):
-    return HttpResponse("NBP check in progress, returned: {}".format(
-        nbp.get_nbp_rate_table_a_with_backtrack(datetime.strptime('2019-07-20', "%Y-%m-%d"), 'USD')))
+def adjust_nbp(request):
+    return HttpResponse("NBP tables review finished, reviewed {} transactions".format(nbp.check_non_pln_transactions()))
