@@ -34,9 +34,9 @@
 <hr>
 
 <h2>Category Groups</h2>
-{% if all_categoryGroups_list %}
+{% if all_category_groups_list %}
     <ul>
-    {% for element in all_categoryGroups_list %}
+    {% for element in all_category_groups_list %}
         <li>{{ element.name }}</li>
     {% endfor %}
     </ul>
@@ -56,9 +56,9 @@
 {% endif %}
 
 <h2>Transaction Types</h2>
-{% if all_transactionTypes_list %}
+{% if all_transaction_types_list %}
     <ul>
-    {% for element in all_transactionTypes_list %}
+    {% for element in all_transaction_types_list %}
         <li>{{ element.name }}</li>
     {% endfor %}
     </ul>
