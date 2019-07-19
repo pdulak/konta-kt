@@ -126,7 +126,7 @@ def get_transactions_review(irrelevant, account_id, direction, start_date,
 
     # account filter
     if account_id[0].isdigit():
-        t = t.filter(account__id=account_id)
+        t = t.filter(account__id=account_id[0])
 
     # direction filter
     if direction[0] == 'I':
@@ -162,7 +162,7 @@ def get_transactions_review(irrelevant, account_id, direction, start_date,
         .select_related('currency') \
         .select_related('category') \
         .values('account', 'account__name', 'amount_account_currency', 'date', 'description', 'party_name',
-                'account__currency__name', 'approved',
+                'account__currency__name', 'approved', 'amount',
                 'category__name', 'category__id', 'type', 'account__bank__name', 'irrelevant', 'id', 'account__id') \
         .order_by(*ordering)
 

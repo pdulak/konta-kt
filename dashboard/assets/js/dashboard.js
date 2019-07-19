@@ -30,6 +30,9 @@ function fill_transaction_row(e, rowToFill) {
         amountCell.setAttribute('class','text-right not-approved');
     }
     amountCell.innerHTML = e.amount_account_currency + ' ' + e.account__currency__name;
+    if (e.account__currency__name != 'PLN') {
+        amountCell.innerHTML += '<br />' + e.amount + ' PLN';
+    }
     if (!e.approved) {
         amountCell.innerHTML += '<button onclick="change_approval(' + e.id + '); return false;" class="btn btn-warning btn-sm">&#10004;</button>';
     }
