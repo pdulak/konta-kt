@@ -64,11 +64,33 @@ def check_non_pln_transactions():
         .values('id', 'account__currency__name') \
         .order_by('date')
 
-    logger.info("Found {} transactions to update".format(t.count()))
+    logger.info("Found {} NON-PLN transactions to update".format(t.count()))
 
     # update one by one
     for tt in t:
         adjust_non_pln_transaction_rate(tt['id'], tt['account__currency__name'])
+
+    return t.count()
+
+
+def check_pln_transactions():
+    """Check the transactions in PLN and adjusts the rate if wrong"""
+
+    # get the transactions list to update (non-PLN, currency multiplier not set)
+    t = Transaction.objects
+    t = t.select_related('account') \
+        .select_related('bank') \
+        .select_related('currency') \
+        .exclude(currency_multiplier=1) \
+        .filter(account__currency__name='PLN') \
+        .values('id') \
+        .order_by('date')
+
+    logger.info("Found {} PLN transactions to update".format(t.count()))
+
+    # update one by one
+    for tt in t:
+        adjust_pln_transaction_rate(tt['id'])
 
     return t.count()
 
@@ -85,3 +107,13 @@ def adjust_non_pln_transaction_rate(transaction_id, currency_code):
         this_transaction.amount = this_transaction.amount_account_currency * Decimal(rate_to_set)
         logger.info("new transaction values: {}".format(this_transaction))
         this_transaction.save()
+
+
+def adjust_pln_transaction_rate(transaction_id):
+    """Adjust PLN transaction to set proper rate and values"""
+
+    this_transaction = Transaction.objects.get(pk=transaction_id)
+    logger.info("Updating {}".format(this_transaction))
+    this_transaction.currency_multiplier = 1
+    this_transaction.amount = this_transaction.amount_account_currency
+    this_transaction.save()

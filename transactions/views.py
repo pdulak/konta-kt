@@ -6,7 +6,9 @@ from django.db.models.functions import TruncMonth, Cast
 from django.http import JsonResponse
 
 from .models import Transaction
-from accounts.models import Account
+from accounts.models import Account, Currency
+from loguru import logger
+from toolbox import nbp
 
 
 def chk_date(date_text):
@@ -77,7 +79,7 @@ def save(request):
     this_account = Account.objects.get(id=request.POST.get('tr_account'))
 
     if int(t_id):
-        # update transaction
+        logger.info('Updating existing transaction {}'.format(t_id))
         this_tr = Transaction.objects.filter(id=t_id).update(
             account=this_account,
             date=request.POST.get('tr_date'),
@@ -110,6 +112,10 @@ def save(request):
             't': this_tr.id
         }
 
+    if this_account.currency.name == 'PLN':
+        nbp.adjust_pln_transaction_rate(data['t'])
+    else:
+        nbp.adjust_non_pln_transaction_rate(data['t'], this_account.currency.name)
 
     return JsonResponse(data)
 
