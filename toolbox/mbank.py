@@ -5,7 +5,7 @@ import pandas as pd
 from io import StringIO
 
 from django.conf import settings
-
+from loguru import logger
 
 description_split_text = 'DATA TRANSAKCJI:'
 
@@ -39,7 +39,7 @@ def load_csv():
 
     list_of_files = glob.glob(os.path.join(source_dir, '*.csv'))
     for this_file in list_of_files:
-        print('adding: ', this_file)
+        logger.info("adding {}".format(this_file))
         this_account_number = ''
         this_data = ''
         save_account_number = False
@@ -82,9 +82,9 @@ def load_csv():
             lambda x: float(re.sub('[^0-9\,\.-]', '', x).replace(',', '.')))
 
         df = df.append(df_temp, ignore_index=True)
-        print('added: ', df_temp.shape)
+        logger.info("added {}".format(df_temp.shape))
 
-    print("Whole dataframe shape: ", df.shape)
-    print(df.info())
+    logger.info("whole DF shape: {}".format(df.shape))
+    logger.info(df.info())
 
     return df

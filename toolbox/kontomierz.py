@@ -4,6 +4,7 @@ import glob
 import pandas as pd
 
 from django.conf import settings
+from loguru import logger
 
 from accounts.models import Account, Bank, Currency
 from transactions.models import CategoryGroup, Category, TransactionType, Transaction
@@ -21,7 +22,7 @@ def load_csv():
 
     list_of_files = glob.glob(os.path.join(sourceDir, '*.csv'))
     for this_file in list_of_files:
-        print('adding: ', this_file)
+        logger.info("adding {}".format(this_file))
         this_data = ''
         with open(this_file, encoding='cp1250') as f:
             for line in f:
@@ -37,10 +38,10 @@ def load_csv():
         df_temp = df_temp.drop(i)
 
         df = df.append(df_temp, ignore_index=True)
-        print('added: ', df_temp.shape)
+        logger.info("added {}".format(df_temp.shape))
 
-    print("Whole dataframe shape: ", df.shape)
-    print(df.info())
+    logger.info("whole DF shape: {}".format(df.shape))
+    logger.info(df.info())
 
     return df
 

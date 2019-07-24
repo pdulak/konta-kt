@@ -1,12 +1,12 @@
 import datetime
 
+from loguru import logger
 from .models import ImportHeader
 from accounts.models import Account
 from transactions.models import Transaction, TransactionImportTemp
 
 
 def do_import(df):
-    print('--------------------------------------------------------')
     numbered_accounts = Account.objects.exclude(number__isnull=True).exclude(number__exact='')
     accounts_numbers = {}
     import_headers = {}
@@ -28,7 +28,7 @@ def do_import(df):
                 if (last_source != row['Source']) or (last_account != row['Account Number']):
                     last_source = row['Source']
                     last_account = row['Account Number']
-                    print(datetime.datetime.now(), ' importing ', last_account, '; ', last_source)
+                    logger.info("importing {} for account {}".format(last_source, last_account))
 
                 # check for transaction duplicate
                 is_duplicate = False
@@ -81,12 +81,11 @@ def do_import(df):
                     is_duplicate=is_duplicate
                 )
             else:
-                print("Account number ", row['Account Number'], " not found")
+                logger.warning("Account number {} not found".format(row['Account Number']))
 
     else:
-        print('Accounts with numbers not found')
+        logger.warning("Accounts with numbers not found")
 
-    print('--------------------------------------------------------')
-    print(datetime.datetime.now(), ' import finished')
+    logger.info("Import finished")
 
     return True

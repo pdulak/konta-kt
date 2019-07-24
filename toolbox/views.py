@@ -48,7 +48,6 @@ def review_database(request):
 
 def load_kontomierz(request):
     # df = kontomierz.load_csv()
-    # print(df.head())
     #
     # # remove already insterted data
     # Transaction.objects.all().delete()

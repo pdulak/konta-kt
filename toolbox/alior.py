@@ -5,7 +5,7 @@ import pandas as pd
 from io import StringIO
 
 from django.conf import settings
-
+from loguru import logger
 
 def get_account_number(x):
     account_number = '76249000050000400031886744'
@@ -43,7 +43,7 @@ def load_csv():
     list_of_files += glob.glob(os.path.join(source_dir, '*.CSV'))
 
     for this_file in list_of_files:
-        print('adding: ', this_file)
+        logger.info("adding {}".format(this_file))
         this_data = ''
         save_transactions = False
         blik_regex = re.compile(r"\;Płatność BLIK\;([^\;]*)\;Płatność BLIK\;([^\;]*)\;", re.IGNORECASE)
@@ -82,9 +82,9 @@ def load_csv():
                                 'sourceIBAN', 'destinationIBAN', 'Currency'], axis=1)
 
         df = df.append(df_temp, ignore_index=True)
-        print('added: ', df_temp.shape)
+        logger.info("added {}".format(df_temp.shape))
 
-    print("Whole dataframe shape: ", df.shape)
-    print(df.info())
+    logger.info("whole DF shape: {}".format(df.shape))
+    logger.info(df.info())
 
     return df
