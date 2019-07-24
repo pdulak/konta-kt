@@ -2,6 +2,7 @@ import os
 import re
 import glob
 import pandas as pd
+from io import StringIO
 
 from django.conf import settings
 
@@ -59,7 +60,7 @@ def load_csv():
                     else:
                         save_transactions = False
 
-        df_temp = pd.read_csv(pd.compat.StringIO(this_data), sep=';', comment='#', engine='python', names=field_names,
+        df_temp = pd.read_csv(StringIO(this_data), sep=';', comment='#', engine='python', names=field_names,
                               quotechar='|', encoding='cp1250', dtype={'Party IBAN': 'str'})
 
         df_temp['Account Number'] = this_account_number

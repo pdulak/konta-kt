@@ -2,24 +2,25 @@ import os
 import re
 import glob
 import pandas as pd
+from io import StringIO
 
 from django.conf import settings
 
 
 def get_account_number(x):
     account_number = '76249000050000400031886744'
-    if (float(x['Amount']) > 0) and (len(x['destinationIBAN']) > 20):
+    if (float(x['Amount']) > 0) and (len(str(x['destinationIBAN'])) > 20):
         account_number = x['destinationIBAN']
-    if (float(x['Amount']) < 0) and (len(x['sourceIBAN']) > 20):
+    if (float(x['Amount']) < 0) and (len(str(x['sourceIBAN'])) > 20):
         account_number = x['sourceIBAN']
 
     return account_number.replace(' ', '')
 
 
 def get_party_iban(x):
-    account_number = x['destinationIBAN']
+    account_number = str(x['destinationIBAN'])
     if float(x['Amount']) > 0:
-        account_number = x['sourceIBAN']
+        account_number = str(x['sourceIBAN'])
 
     return account_number.replace(' ', '')
 
@@ -55,7 +56,7 @@ def load_csv():
                     line = blik_regex.sub(r"\;Płatność BLIK | \1 | \2 \;", line)
                     this_data += line
 
-        df_temp = pd.read_csv(pd.compat.StringIO(this_data), sep=';', comment='#', engine='python', names=field_names,
+        df_temp = pd.read_csv(StringIO(this_data), sep=';', comment='#', engine='python', names=field_names,
                               encoding='cp1250', dtype={'Date': 'str', 'Added': 'str', 'sourceIBAN': 'str',
                                                         'destinationIBAN': 'str'})
 
