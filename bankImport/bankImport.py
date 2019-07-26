@@ -7,7 +7,7 @@ from loguru import logger
 browsers = ["Chrome"]
 
 for SeleniumDrivers.current_driver in browsers:
-    loguru.info("Importing in {}".format(SeleniumDrivers.current_driver))
+    logger.info("Importing in {}".format(SeleniumDrivers.current_driver))
 
     # initialize the test suite
     loader = unittest.TestLoader()
