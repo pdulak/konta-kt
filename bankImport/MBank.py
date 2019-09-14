@@ -6,6 +6,7 @@ import SeleniumDrivers
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from loguru import logger
 
 
 class MBank(unittest.TestCase):
@@ -30,11 +31,15 @@ class MBank(unittest.TestCase):
         elem = driver.find_element_by_name("pass")
         elem.send_keys(SeleniumDrivers.user_pass)
         driver.find_element_by_id("submitButton").click()
+        # time for popup close
+        input("Press Enter to continue")
+
         # switch to full history
         element = WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, "full-history"))
         )
         element.click()
+        logger.info("full history clicked")
         # switch to the other view
         WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, "transactionListContainer"))
@@ -75,16 +80,16 @@ class MBank(unittest.TestCase):
         number_of_accounts = len(accounts)
 
         for i in range(0, number_of_accounts):
-            time.sleep(2)
+            time.sleep(0.5)
             WebDriverWait(driver, 15).until(
                 EC.presence_of_element_located((By.ID, "MenuAccountsCombo"))
             )
             accounts_combo = driver.find_element_by_id("MenuAccountsCombo")
             accounts_combo.click()
-            time.sleep(2)
+            time.sleep(0.5)
             accounts = [x for x in accounts_combo.find_elements_by_tag_name("option")]
             accounts[i].click()
-            time.sleep(2)
+            time.sleep(0.5)
             WebDriverWait(driver, 15).until(
                 EC.presence_of_element_located((By.ID, "Submit"))
             )

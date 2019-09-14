@@ -54,6 +54,7 @@ def load_csv():
                     save_transactions = True
                 elif save_transactions:
                     line = blik_regex.sub(r"\;Płatność BLIK | \1 | \2 \;", line)
+                    line = line.replace("\"SALAD STORY\"","SALAD STORY")
                     this_data += line
 
         df_temp = pd.read_csv(StringIO(this_data), sep=';', comment='#', engine='python', names=field_names,
