@@ -31,70 +31,92 @@ class MBank(unittest.TestCase):
         elem = driver.find_element_by_name("pass")
         elem.send_keys(SeleniumDrivers.user_pass)
         driver.find_element_by_id("submitButton").click()
-        # time for popup close
-        input("Press Enter to continue")
+        element = WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Jednorazowy dostęp')]"))
+        )
+        element.find_element_by_xpath('../..').click()
 
         # switch to full history
-        element = WebDriverWait(driver, 15).until(
+        element = WebDriverWait(driver, 60).until(
             EC.presence_of_element_located((By.ID, "full-history"))
         )
         element.click()
         logger.info("full history clicked")
+        time.sleep(3)
+
         # switch to the other view
-        WebDriverWait(driver, 15).until(
-            EC.presence_of_element_located((By.ID, "transactionListContainer"))
-        )
         element = WebDriverWait(driver, 15).until(
-            EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Zmień widok')]"))
+            EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Zestawienie operacji')]"))
         )
         element.click()
+        logger.info("Zestawienie operacji clicked")
 
-        # switch to iFrame
-        driver.get("https://online.mbank.pl/csite/account_oper_list.aspx")
-        # wait for select
-        WebDriverWait(driver, 15).until(
-            EC.presence_of_element_located((By.ID, "MenuAccountsCombo"))
+        # select proper format - CSV
+        element = WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Format zestawienia')]"))
         )
-
-        # select proper options on the form
-        driver.find_element_by_id("lastdays_radio").click()
-        days_field = driver.find_element_by_id("lastdays_days")
-        days_field.clear()
-        days_field.send_keys("4")
-        period_select = driver.find_element_by_id("lastdays_period")
-        period_select.click()
-        period_options = [x for x in period_select.find_elements_by_tag_name("option")]
-        period_options[1].click()
-
-        driver.find_element_by_id("export_oper_history_check").click()
-        format_select = driver.find_element_by_id("export_oper_history_format")
-        format_select.click()
-        format_options = [x for x in format_select.find_elements_by_tag_name("option")]
-        format_options[2].click()
-
-        # loop by accounts, get CSV
-        accounts_combo = WebDriverWait(driver, 15).until(
-            EC.presence_of_element_located((By.ID, "MenuAccountsCombo"))
+        select_div = element.find_element_by_xpath('../../div')
+        select_div.click()
+        element = WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, "//li[contains(text(), 'CSV')]"))
         )
-        accounts = [x for x in accounts_combo.find_elements_by_tag_name("option")]
+        element.click()
+        logger.info("CSV selection clicked")
+
+        # select proper time - 3 months
+        element = WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'ostatnie 3 miesiące')]"))
+        )
+        element.find_element_by_xpath('../../../input').click()
+        logger.info("3 months selection clicked")
+
+        # wait for the account select to be visible
+        element = WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Z rachunku')]"))
+        )
+        # show accounts list
+        select_div = element.find_element_by_xpath('../../div')
+        select_div.click()
+        logger.info("list of accounts clicked")
+
+        # locate first account on the list
+        element = WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.ID, "menu-root"))
+        )
+        accounts_list = element.find_element_by_xpath('div/div/div/ul')
+        accounts = accounts_list.find_elements_by_tag_name("li")
         number_of_accounts = len(accounts)
+        logger.info("number of accounts: {}".format(number_of_accounts))
+        accounts[0].click()
 
         for i in range(0, number_of_accounts):
-            time.sleep(0.5)
-            WebDriverWait(driver, 15).until(
-                EC.presence_of_element_located((By.ID, "MenuAccountsCombo"))
+            logger.info("selecting accounts one by one, now it is {}".format(i))
+            # wait for the account select to be visible
+            element = WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Z rachunku')]"))
             )
-            accounts_combo = driver.find_element_by_id("MenuAccountsCombo")
-            accounts_combo.click()
-            time.sleep(0.5)
-            accounts = [x for x in accounts_combo.find_elements_by_tag_name("option")]
+            # show accounts list
+            select_div = element.find_element_by_xpath('../../div')
+            select_div.click()
+
+            # locate first account on the list
+            element = WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.ID, "menu-root"))
+            )
+            accounts_list = element.find_element_by_xpath('div/div/div/ul')
+            accounts = accounts_list.find_elements_by_tag_name("li")
             accounts[i].click()
-            time.sleep(0.5)
-            WebDriverWait(driver, 15).until(
-                EC.presence_of_element_located((By.ID, "Submit"))
+
+            # wait for the account select to be visible
+            element = WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Pobierz zestawienie')]"))
             )
-            driver.find_element_by_id("Submit").click()
-            time.sleep(4)
+            element.find_element_by_xpath('../..').click()
+            time.sleep(2)
+            logger.info("download in progress")
+
+        logger.info("operation finished")
+
 
     def tearDown(self):
         # nothing to do

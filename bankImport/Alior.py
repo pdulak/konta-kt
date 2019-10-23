@@ -20,7 +20,9 @@ class Alior(unittest.TestCase):
     def test_alior_login(self):
         driver = self.driver
 
-        elem = driver.find_element_by_id("login")
+        elem = WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.ID, "login"))
+        )
         elem.send_keys(SeleniumDrivers.alior_user_name)
 
         driver.find_element_by_xpath("//button[@type='submit']").click()
