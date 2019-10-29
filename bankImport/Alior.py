@@ -1,7 +1,10 @@
 import os
 import unittest
 import SeleniumDrivers
-
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from loguru import logger
 
 class Alior(unittest.TestCase):
 
@@ -20,12 +23,27 @@ class Alior(unittest.TestCase):
     def test_alior_login(self):
         driver = self.driver
 
+        # enter user ID
         elem = WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, "login"))
         )
         elem.send_keys(SeleniumDrivers.alior_user_name)
 
         driver.find_element_by_xpath("//button[@type='submit']").click()
+
+        # enter password
+        elem = WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, "//div[contains(@class, 'js-password-masked-fields')]"))
+        )
+        maskedInputs = elem.find_elements_by_xpath("//div[contains(@class, 'js-password-masked-fields')]/div[contains(@class, 'masked-input-wrapper')]/input[not(contains(@class, 'visually-hidden'))]")
+
+        logger.info(len(maskedInputs))
+        for i, e in enumerate(maskedInputs):
+            if e.is_enabled():
+                e.send_keys(SeleniumDrivers.user_pass[i])
+                logger.info("On location {} placing char {}".format(i, SeleniumDrivers.user_pass[i]))
+
+
 
     def tearDown(self):
         # nothing to do
