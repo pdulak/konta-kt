@@ -5,6 +5,7 @@ import getpass
 import SeleniumDrivers
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from loguru import logger
 
@@ -37,10 +38,15 @@ class MBank(unittest.TestCase):
         element.find_element_by_xpath('../..').click()
 
         # switch to full history
-        element = WebDriverWait(driver, 60).until(
-            EC.presence_of_element_located((By.ID, "full-history"))
+        full_history_element = WebDriverWait(driver, 60).until(
+            EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Cała historia')]"))
         )
-        element.click()
+
+        # close additional dialogs if needed
+        time.sleep(3)
+
+        # click full history button
+        full_history_element.click()
         logger.info("full history clicked")
         time.sleep(3)
 
@@ -50,6 +56,7 @@ class MBank(unittest.TestCase):
         )
         element.click()
         logger.info("Zestawienie operacji clicked")
+        time.sleep(3)
 
         # select proper format - CSV
         element = WebDriverWait(driver, 15).until(
