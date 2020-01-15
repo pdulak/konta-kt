@@ -38,7 +38,9 @@ def do_import(df):
                                                              amount_account_currency=row['Amount Modified'],
                                                              balance_account_currency=row['Balance Modified'],
                                                              imported_description__contains=row['Description']
-                                                             ).count()
+                                                             )\
+                    .exclude(import_header=import_headers[row['Source']])\
+                    .count()
 
                 if chk_transaction:
                     is_duplicate = True
