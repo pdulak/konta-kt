@@ -38,25 +38,15 @@ class MBank(unittest.TestCase):
         element.find_element_by_xpath('../..').click()
 
         # switch to full history
-        full_history_element = WebDriverWait(driver, 60).until(
-            EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Cała historia')]"))
+        logger.info("Waiting for payments to appear")
+        payments_element = WebDriverWait(driver, 30).until(
+            EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Cała historia')]" ))
         )
 
-        # close additional dialogs if needed
-        time.sleep(3)
-
-        # click full history button
-        full_history_element.click()
-        logger.info("full history clicked")
-        time.sleep(3)
-
-        # switch to the other view
-        element = WebDriverWait(driver, 15).until(
-            EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Zestawienie operacji')]"))
-        )
-        element.click()
-        logger.info("Zestawienie operacji clicked")
-        time.sleep(3)
+        # switch using JS :)
+        driver.execute_script("document.querySelector('mega-menu').shadowRoot.querySelector('nav > ul > li:nth-child(2) > button').click()")
+        time.sleep(1)
+        driver.execute_script("document.querySelector('mega-menu').shadowRoot.querySelector('div > div > div > div:nth-child(3) > div:nth-child(1) > div > ul > li:nth-child(3) > a').click()")
 
         # select proper format - CSV
         element = WebDriverWait(driver, 15).until(
