@@ -81,3 +81,9 @@ def load_alior(request):
 
 def adjust_nbp(request):
     return HttpResponse("NBP tables review finished, reviewed {} NON-PLN transactions and {} PLN transactions".format(nbp.check_non_pln_transactions(), nbp.check_pln_transactions()))
+
+
+def do_cleanup(request):
+    common.do_cleanup()
+
+    return HttpResponse("Cleanup performed");

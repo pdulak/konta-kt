@@ -1,7 +1,11 @@
+import glob
+import os
 import datetime
+import shutil
 
 from loguru import logger
 from .models import ImportHeader
+from django.conf import settings
 from accounts.models import Account
 from transactions.models import Transaction, TransactionImportTemp
 
@@ -91,3 +95,26 @@ def do_import(df):
     logger.info("Import finished")
 
     return True
+
+def do_cleanup():
+    source_dir = os.path.join(settings.BASE_DIR, 'temp')
+    list_of_files = glob.glob(os.path.join(source_dir, '*.csv'))
+    for this_file in list_of_files:
+        logger.info("Removing {}".format(this_file))
+        os.remove(this_file)
+
+    source_dir = os.path.join(settings.BASE_DIR, 'temp', 'alior')
+    list_of_files = glob.glob(os.path.join(source_dir, '*.csv'))
+    list_of_files += glob.glob(os.path.join(source_dir, '*.CSV'))
+    for this_file in list_of_files:
+        logger.info("Removing {}".format(this_file))
+        os.remove(this_file)
+
+    source_dir = settings.BASE_DIR
+    destination_dir = os.path.join(settings.BASE_DIR, 'BACKUPS')
+    list_of_files = glob.glob(os.path.join(source_dir, 'db.sqlite3'))
+    for this_file in list_of_files:
+        date_to_save = datetime.datetime.now().strftime("-%Y%m%d-%H%M%S")
+        dest_file = this_file.replace('db.sqlite3', 'BACKUPS/db' + date_to_save + '.sqlite3')
+        logger.info("Copying {} to {}".format(this_file, dest_file))
+        shutil.copyfile(this_file, dest_file)
