@@ -127,3 +127,5 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
     os.path.join(BASE_DIR, 'dashboard', 'assets'),
 ]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
