@@ -48,7 +48,7 @@ def load_csv():
             for line in f:
                 if line[:15] == '#Numer rachunku':
                     save_account_number = True
-                elif line[:14] == '#Data operacji':
+                elif line[:14][:9] == '#Data ksi':
                     save_transactions = True
                 elif save_account_number:
                     this_account_number = line[:32].replace(' ', '')
@@ -62,6 +62,11 @@ def load_csv():
 
         df_temp = pd.read_csv(StringIO(this_data), sep=';', comment='#', engine='python', names=field_names,
                               quotechar='|', encoding='cp1250', dtype={'Party IBAN': 'str'})
+
+        logger.warning(this_file);
+        logger.warning(this_data);
+        logger.warning(this_account_number);
+        # logger.info(df_temp);
 
         df_temp['Account Number'] = this_account_number
         df_temp['Source'] = os.path.basename(this_file)
