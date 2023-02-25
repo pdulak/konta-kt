@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404
 
 from .models import Account, Bank
@@ -25,4 +25,7 @@ def account_detail(request, account_id):
 def bank_detail(request, bank_id):
     bank = get_object_or_404(Bank, pk=bank_id)
     return render(request, 'accounts/bank_detail.html', {'bank': bank})
+
+def redirect_to_dashboard(request):
+    return redirect('/')
 
