@@ -21,7 +21,7 @@ urlpatterns = [
     path('toolbox/', include('toolbox.urls')),
     path('transactions/', include('transactions.urls')),
     path('auth/', include('django.contrib.auth.urls')),
-    path('nordigen/', include('nordigen.urls')),
+    path('nordigen/', include('nordigenapp.urls')),
     path('admin/', admin.site.urls),
     path('', include('dashboard.urls')),
 ]

@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'toolbox.apps.ToolboxConfig',
     'dashboard.apps.DashboardConfig',
     'login.apps.LoginConfig',
-    'nordigen.apps.NordigenConfig',
+    'nordigenapp.apps.NordigenConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
