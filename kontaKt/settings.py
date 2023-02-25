@@ -25,8 +25,9 @@ SECRET_KEY = '&phgdiyhv!c!$^^-uhwrp3k$$v(4yb=03q+(ymc2y8&18j-rz7'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['kontakt.dulare.com', '127.0.0.1']
 
+CSRF_TRUSTED_ORIGINS = ['https://kontakt.dulare.com', 'http://127.0.0.1']
 
 # Application definition
 
