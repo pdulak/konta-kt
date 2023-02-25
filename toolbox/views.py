@@ -8,17 +8,19 @@ from datetime import datetime
 # from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 
 from accounts.models import Account, Bank, Currency
 from transactions.models import CategoryGroup, Category, TransactionType, Transaction
 
 from loguru import logger
 
-
+@login_required(login_url='/auth/login/')
 def index(request):
     return HttpResponse("Hello, world. You're at the toolbox index.")
 
 
+@login_required(login_url='/auth/login/')
 def review_database(request):
     latest_accounts_list = Account.objects.order_by('-id')[:15]
     all_banks_list = Bank.objects.order_by('id')
@@ -46,6 +48,7 @@ def review_database(request):
     return render(request, 'toolbox/review.html', context)
 
 
+@login_required(login_url='/auth/login/')
 def load_kontomierz(request):
     # df = kontomierz.load_csv()
     #
@@ -63,6 +66,7 @@ def load_kontomierz(request):
     return HttpResponse("Loading kontomierz CSV;")
 
 
+@login_required(login_url='/auth/login/')
 def load_mbank(request):
     df = mbank.load_csv()
 
@@ -71,6 +75,7 @@ def load_mbank(request):
     return HttpResponse("Loaded mBank CSV;")
 
 
+@login_required(login_url='/auth/login/')
 def load_alior(request):
     df = alior.load_csv()
 
@@ -79,10 +84,12 @@ def load_alior(request):
     return HttpResponse("Loaded Alior CSV;")
 
 
+@login_required(login_url='/auth/login/')
 def adjust_nbp(request):
     return HttpResponse("NBP tables review finished, reviewed {} NON-PLN transactions and {} PLN transactions".format(nbp.check_non_pln_transactions(), nbp.check_pln_transactions()))
 
 
+@login_required(login_url='/auth/login/')
 def do_cleanup(request):
     common.do_cleanup()
 

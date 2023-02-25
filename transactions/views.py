@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.db.models import Sum, Q, DecimalField
 from django.db.models.functions import TruncMonth, Cast
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
 from .models import Transaction
 from accounts.models import Account, Currency
@@ -49,6 +50,7 @@ def get_monthly_review():
         .order_by('-month')
 
 
+@login_required(login_url='/auth/login/')
 def change_relevancy(request):
     t_id = request.POST.get('t_id')
     r_to_set = (request.POST.get('r_to_set') == 'true')
@@ -61,6 +63,7 @@ def change_relevancy(request):
     return JsonResponse(data)
 
 
+@login_required(login_url='/auth/login/')
 def change_approval(request):
     t_id = request.POST.get('t_id')
     a_to_set = (request.POST.get('a_to_set') == 'true')
@@ -73,6 +76,7 @@ def change_approval(request):
     return JsonResponse(data)
 
 
+@login_required(login_url='/auth/login/')
 def save(request):
     t_id = request.POST.get('tr_id')
 
@@ -175,6 +179,7 @@ def get_transactions_review(irrelevant, account_id, direction, start_date,
     return t, filter_start_date.strftime('%Y-%m-%d'), filter_end_date.strftime('%Y-%m-%d')
 
 
+@login_required(login_url='/auth/login/')
 def monthly_review(request):
     context = {
         'months_list': get_monthly_review(),
@@ -182,6 +187,7 @@ def monthly_review(request):
     return render(request, 'transactions/monthly_review.html', context)
 
 
+@login_required(login_url='/auth/login/')
 def account_balance(request):
     context = {
         'accounts_list': get_account_balance(),
@@ -189,6 +195,7 @@ def account_balance(request):
     return render(request, 'transactions/account_balance.html', context)
 
 
+@login_required(login_url='/auth/login/')
 def months(request):
     data = {
         'months': list(get_monthly_review()[:3])
