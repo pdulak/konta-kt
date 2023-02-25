@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'transactions.apps.TransactionsConfig',
     'toolbox.apps.ToolboxConfig',
     'dashboard.apps.DashboardConfig',
+    'login.apps.LoginConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
