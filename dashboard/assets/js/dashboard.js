@@ -103,6 +103,7 @@ function reset_filters() {
     document.filters.end_date.value = "";
     load_transactions();
     load_months();
+    load_accounts_balance();
 }
 
 function change_relevancy_modal() {
@@ -123,6 +124,7 @@ function change_relevancy(t_id) {
                 thisRow.empty();
                 thisRow = fill_transaction_row(transactions[t_id], thisRow[0]);
                 load_months();
+                load_accounts_balance();
             },
             dataType: 'json',
             failure: function(errMsg) {
@@ -182,6 +184,7 @@ function tr_save(is_new) {
 
             load_transactions();
             load_months();
+            load_accounts_balance();
         },
         dataType: 'json',
         failure: function(errMsg) {
@@ -251,11 +254,20 @@ function change_approval(t_id) {
     }
 }
 
+function load_accounts_balance() {
+    fetch('/account_balance/')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('accountAccordion').innerHTML = html;
+        });
+}
+
 var transactions = [];
 
 $(function(){
     load_transactions();
     load_months();
+    load_accounts_balance();
 
     $('#transactions_table .date-header').on("click",function(){
         $('#transactions_table th').removeClass('activeUp').removeClass('activeDown');

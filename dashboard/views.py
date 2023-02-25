@@ -23,3 +23,11 @@ def j_transactions(request):
         'end_date': filter_end_date
     }
     return JsonResponse(data)
+
+
+@login_required(login_url='/auth/login/')
+def account_balance(request):
+    context = {
+        'accounts_list': get_account_balance(),
+    }
+    return render(request, 'dashboard/accounts_info.html', context)

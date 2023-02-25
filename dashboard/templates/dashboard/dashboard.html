@@ -114,41 +114,6 @@
 
 {% block accounts_info %}
     <div class="accordion" id="accountAccordion">
-        <div>
-            <div>
-                <div>
-
-        {% if accounts_list %}
-            {% for account in accounts_list %}
-                {% ifchanged account.account__bank__name %}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header" id="heading{{ account.account__bank__id }}" style="padding: 2px">
-                            <button class="btn btn-link {% if account.account__bank__hide == 1 %}collapsed{% endif %}" type="button" data-toggle="collapse"
-                                        data-target="#collapse{{ account.account__bank__id }}" aria-expanded="true"
-                                        aria-controls="collapse{{ account.account__bank__id }}" style="padding: 2px">
-                                    {{ account.account__bank__name }}
-                            </button>
-                        </div>
-                        <div id="collapse{{ account.account__bank__id }}" class="collapse {% if account.account__bank__hide != 1 %}show{% endif %}"
-                             aria-labelledby="heading{{ account.account__bank__id }}"
-                             data-parent="#accountAccordion">
-                            <div class="card-body" style="padding: 5px">
-                {% endifchanged %}
-
-                                <div class="row single-account">
-                                    <div class="col-6">{{ account.account__name }}</div>
-                                    <div class="col-6 text-right"><strong>{{ account.total|floatformat:2 }}</strong> {{ account.account__currency__name }}</div>
-                                </div>
-            {% endfor %}
-        {% else %}
-            <p>No accounts are available.</p>
-        {% endif %}
-                </div>
-            </div>
-        </div>
     </div>
 {% endblock %}
 
