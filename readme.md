@@ -1,4 +1,18 @@
+The app works in Docker now. It can be used locally under:
 
+`http://127.0.0.1:8314`
+
+Or via tunnel and URL of:
+
+`https://kontakt.dulare.com/`
+
+Start app:
+
+`docker-compose up`
+
+Start tunnel:
+
+`ssh dlr2022tunnel`
 
 ---
 
