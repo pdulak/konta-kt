@@ -24,6 +24,10 @@ Create new app:
 
 `python manage.py startapp new_app_name`
 
+Once added, go to settings.py and add in INSTALLED_APPS section
+
+---
+
 Go to the Docker image and execute commands in Bash:
 
 `docker exec -it <name of image> bash`
