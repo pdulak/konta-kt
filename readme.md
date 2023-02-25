@@ -4,7 +4,7 @@
 
 Work in Docker shell:
 
-`docker exec -it awshelper_awshelper_1 /bin/bash`
+`docker exec -it konta-kt /bin/bash`
 
 Create new app:
 
@@ -28,18 +28,3 @@ python manage.py makemigrations             # <- all models
 Execute migrations:
 
 `python manage.py migrate`
-
----
-
-Windows:
----
-
-Install virtualenvwrapper-win
-> pip install virtualenvwrapper-win
-
-Create a virtual environment
-> mkvirtualenv konta-kt
-
-Start working on the project:
-> workon konta-kt
-
