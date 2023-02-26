@@ -1,0 +1,15 @@
+<h5>Accounts</h5>
+<ul>
+    {% for account in requisition.accounts %}
+        <li>
+            <a href="/nordigen/account_details/{{ account }}/">{{ account }}</a>
+            {% if kontakt_accounts %}
+                {% for kontakt_account in kontakt_accounts %}
+                    {% if kontakt_account.nordigen_id == account %}
+                        <br><strong>ASSIGNED TO: {{ kontakt_account.bank__name }}: {{ kontakt_account.name }}</strong>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

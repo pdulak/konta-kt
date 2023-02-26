@@ -7,7 +7,7 @@
             <h4>Current connections and accounts</h4>
             <ul>
                 {% for requisition in requisitions.results %}
-                    <li>
+                    <li style="margin-bottom: 40px">
                         <h4>{{ requisition.institution_id }}</h4>
                         <a href="{{ requisition.link }}" target="_blank">Connect additional account</a><br>
     {#                    {{ requisition.id }}<br>#}
@@ -15,12 +15,7 @@
                         status: {{ requisition.status }}<br>
                         <br>
                         {% if requisition.accounts %}
-                            <h5>Accounts</h5>
-                            <ul>
-                                {% for account in requisition.accounts %}
-                                    <li><a href="/nordigen/account_details/{{ account }}/">{{ account }}</a></li>
-                                {% endfor %}
-                            </ul>
+                            {% include 'nordigen/requisition_accounts_list.html' %}
                         {% endif %}
                     </li>
                 {% endfor %}

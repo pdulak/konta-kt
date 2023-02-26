@@ -1,4 +1,5 @@
 {% extends 'dashboard/base_layout.html' %}
+{% load static %}
 {% block main_container %}
 
     <div class="col col-xl-6 col-lg-12">
@@ -10,6 +11,32 @@
                 <li>Owner: {{ details.account.ownerName }}</li>
                 <li>Type: {{ details.account.cashAccountType }}</li>
             </ul>
+        {% endif %}
+        {% if kontakt_accounts %}
+            Assign to account:
+            <select id="nordigen_assignment">
+                {% for k_account in kontakt_accounts %}
+                    <option value="{{ k_account.id }}" {% if k_account.nordigen_id == account_id %}SELECTED{% endif %} >
+                        {{ k_account.bank__name }}: {{ k_account.name }}; {{ k_account.number }} Current Nordigen: {{ k_account.nordigen_id }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button onclick="assign_to_account()">Assign</button>
+            <div id="assignment_result"></div>
+
+            <script>
+                function assign_to_account() {
+                    const account_select = document.getElementById('nordigen_assignment');
+                    const selected_account = account_select.options[account_select.selectedIndex].value;
+                    document.getElementById('assignment_result').innerHTML = '<img src="{% static 'images/ajaxloader.gif' %}">';
+
+                    fetch(`/nordigen/assign_account/${selected_account}/{{ account_id }}/{{ details.account.iban }}/`)
+                        .then(response => response.text())
+                        .then(html => {
+                            document.getElementById('assignment_result').innerHTML = html;
+                        });
+                }
+            </script>
         {% endif %}
     </div>
 

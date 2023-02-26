@@ -7,6 +7,7 @@ from loguru import logger
 import environ
 import os
 
+from accounts.models import Account
 
 is_nordigen_initialized = False
 env = environ.Env()
@@ -29,6 +30,7 @@ def noridgen_initialize():
         is_nordigen_initialized = True
         logger.info('Nordigen initialized')
     return nordigen_client
+
 
 def nordigen_calls():
     #
@@ -58,6 +60,7 @@ def get_list_of_banks():
     client = noridgen_initialize()
     return client.institution.get_institutions("PL")
 
+
 def initialize_bank_connection(institution_id):
     client = noridgen_initialize()
     init = client.initialize_session(
@@ -69,9 +72,11 @@ def initialize_bank_connection(institution_id):
         reference_id=str(uuid4())
     )
 
+
 def list_requisitions():
     client = noridgen_initialize()
     return client.requisition.get_requisitions()
+
 
 def get_account_details(account_id):
     client = noridgen_initialize()
@@ -88,39 +93,54 @@ def get_account_details(account_id):
     #     'transactions': account.get_transactions(),
     # }
 
+
 @login_required(login_url='/auth/login/')
 def bank_list(request):
     context = {
         'institutions': get_list_of_banks(),
         'requisitions': list_requisitions(),
+        'kontakt_accounts': get_accounts_with_assignments(),
     }
     return render(request, 'nordigen/bank_list.html', context)
+
 
 @login_required(login_url='/auth/login/')
 def index(request):
     return render(request, 'nordigen/index.html')
+
 
 @login_required(login_url='/auth/login/')
 def log_response(request):
     logger.info(request.POST)
     return render(request, 'nordigen/index.html')
 
+
 @login_required(login_url='/auth/login/')
 def test(request):
     return render(request, 'nordigen/index.html')
+
 
 @login_required(login_url='/auth/login/')
 def connect_bank(request, institution_id):
     initialize_bank_connection(institution_id)
     return redirect('/nordigen/bank_list')
 
+
 @login_required(login_url='/auth/login/')
 def account_details(request, account_id):
     context = {
         'account_id': account_id,
-        'details': get_account_details(account_id)
+        'details': get_account_details(account_id),
+        'kontakt_accounts': get_accounts_with_assignments(),
     }
-    logger.info(context)
     return render(request, 'nordigen/account.html', context)
 
+@login_required(login_url='/auth/login/')
+def assign_account(request, kontakt_account_id, nordigen_account_id, iban):
+    Account.objects.filter(id=kontakt_account_id).update(iban=iban, nordigen_id=nordigen_account_id)
+    return render(request, 'nordigen/account_assignment_result.html')
 
+def get_accounts_with_assignments():
+    return Account.objects.select_related('bank') \
+        .values('name', 'number', 'bank__name', 'id', 'nordigen_id') \
+        .order_by('bank__name', 'name')
