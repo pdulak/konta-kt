@@ -18,7 +18,7 @@
                             <h5>Accounts</h5>
                             <ul>
                                 {% for account in requisition.accounts %}
-                                <li>{{ account }}</li>
+                                    <li><a href="/nordigen/account_details/{{ account }}/">{{ account }}</a></li>
                                 {% endfor %}
                             </ul>
                         {% endif %}
@@ -34,7 +34,7 @@
             <ul>
                 {% for institution in institutions %}
                     <li>
-                        <a href="/nordigen/connect_bank/{{ institution.id }}">{{ institution.name }}</a>
+                        <a href="/nordigen/connect_bank/{{ institution.id }}/">{{ institution.name }}</a>
                     </li>
                 {% endfor %}
             </ul>

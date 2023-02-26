@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from uuid import uuid4
@@ -71,6 +71,20 @@ def list_requisitions():
     client = noridgen_initialize()
     return client.requisition.get_requisitions()
 
+def get_account_details(account_id):
+    client = noridgen_initialize()
+    account = client.account_api(id=account_id)
+    return {
+        # Fetch account metadata
+        'meta_data': account.get_metadata(),
+        # Fetch details
+        'details': account.get_details(),
+        # Fetch balances
+        'balances': account.get_balances(),
+        # Fetch transactions
+        'transactions': account.get_transactions(),
+    }
+
 @login_required(login_url='/auth/login/')
 def bank_list(request):
     context = {
@@ -90,10 +104,20 @@ def log_response(request):
 
 @login_required(login_url='/auth/login/')
 def test(request):
-    # ALIOR_ALBPPLPW
-    # MBANK_RETAIL_BREXPLPW
-    # initialize_bank_connection('ALIOR_ALBPPLPW')
-    list_requisitions()
     return render(request, 'nordigen/index.html')
+
+@login_required(login_url='/auth/login/')
+def connect_bank(request, institution_id):
+    initialize_bank_connection(institution_id)
+    return redirect('/nordigen/bank_list')
+
+@login_required(login_url='/auth/login/')
+def account_details(request, account_id):
+    context = {
+        'account_id': account_id,
+        'details': get_account_details(account_id)
+    }
+    logger.info(context)
+    return render(request, 'nordigen/account.html', context)
 
 

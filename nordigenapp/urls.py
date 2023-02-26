@@ -7,4 +7,6 @@ urlpatterns = [
     path('bank_list/', views.bank_list, name='nordigen_bank_list'),
     path('log_response/', views.log_response, name='nordigen_log_response'),
     path('test/', views.test, name='nordigen_test'),
+    path('connect_bank/<str:institution_id>/', views.connect_bank, name='nordigen_connect_bank'),
+    path('account_details/<str:account_id>/', views.account_details, name='nordigen_account_details'),
 ]
