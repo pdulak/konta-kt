@@ -46,3 +46,32 @@ python manage.py makemigrations             # <- all models
 Execute migrations:
 
 `python manage.py migrate`
+
+---
+
+Shell scripts:
+
+`run-kontakt`
+```shell
+#!/bin/bash
+echo "Starting SSH Tunnel"
+ssh -f -N -T -M tunnel_server
+
+echo "Starting KontaKt"
+cd /projects/konta-kt/
+docker-compose up
+
+echo "Closing SSH Tunnel"
+ssh -T -O "exit" tunnel_server
+```
+
+`ssh config`
+```shell
+Host tunnel_server
+  User uname
+  Port 12345
+  HostName ip.address
+  IdentityFile ~/.ssh/id_rsa.pub
+  IdentitiesOnly Yes
+  RemoteForward 8314 localhost:8314
+```
