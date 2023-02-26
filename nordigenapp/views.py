@@ -8,38 +8,33 @@ import environ
 import os
 
 
-def nordigen_calls():
-    env = environ.Env()
-    environ.Env.read_env(os.path.join(settings.BASE_DIR, '.env'))
-    client = NordigenClient(
-        secret_id=env('NORDIGEN_ID'),
-        secret_key=env('NORDIGEN_SECRET')
-    )
+is_nordigen_initialized = False
+env = environ.Env()
+environ.Env.read_env(os.path.join(settings.BASE_DIR, '.env'))
+nordigen_client = NordigenClient(
+    secret_id=env('NORDIGEN_ID'),
+    secret_key=env('NORDIGEN_SECRET')
+)
 
+
+def noridgen_initialize():
+    global is_nordigen_initialized, nordigen_client
+    if (is_nordigen_initialized):
+        pass
+    else:
+        token_data = nordigen_client.generate_token()
+        logger.info(token_data)
+        logger.info(nordigen_client.token)
+        is_nordigen_initialized = True
+    return nordigen_client
+
+def nordigen_calls():
     #
     # https://github.com/nordigen/nordigen-python
     #
 
-    # Create new access and refresh token
-    # Parameters can be loaded from .env or passed as a string
-    # Note: access_token is automatically injected to other requests after you successfully obtain it
-    token_data = client.generate_token()
-
-    # Use existing token
-    # client.token = "YOUR_TOKEN"
-
     # Exchange refresh token for new access token
     # new_token = client.exchange_token(token_data["refresh"])
-
-    # Get institution id by bank name and country
-    # institution_id = client.institution.get_institution_id_by_name(
-    #     country="LV",
-    #     institution="Revolut"
-    # )
-
-    # Get all institution by providing country code in ISO 3166 format
-    institutions = client.institution.get_institutions("PL")
-    logger.info(institutions)
 
     # Initialize bank session
     # init = client.initialize_session(
@@ -57,24 +52,11 @@ def nordigen_calls():
 
 
 def get_list_of_banks():
-    env = environ.Env()
-    environ.Env.read_env(os.path.join(settings.BASE_DIR, '.env'))
-    client = NordigenClient(
-        secret_id=env('NORDIGEN_ID'),
-        secret_key=env('NORDIGEN_SECRET')
-    )
-    token_data = client.generate_token()
+    client = noridgen_initialize()
     return client.institution.get_institutions("PL")
 
 def initialize_bank_connection(institution_id):
-    env = environ.Env()
-    environ.Env.read_env(os.path.join(settings.BASE_DIR, '.env'))
-    #Initialize bank session
-    client = NordigenClient(
-        secret_id=env('NORDIGEN_ID'),
-        secret_key=env('NORDIGEN_SECRET')
-    )
-    token_data = client.generate_token()
+    client = noridgen_initialize()
     init = client.initialize_session(
         # institution id
         institution_id=institution_id,
@@ -86,14 +68,7 @@ def initialize_bank_connection(institution_id):
     logger.info(init)
 
 def list_requisitions():
-    env = environ.Env()
-    environ.Env.read_env(os.path.join(settings.BASE_DIR, '.env'))
-    #Initialize bank session
-    client = NordigenClient(
-        secret_id=env('NORDIGEN_ID'),
-        secret_key=env('NORDIGEN_SECRET')
-    )
-    token_data = client.generate_token()
+    client = noridgen_initialize()
     logger.info(client.requisition.get_requisitions())
 
 @login_required(login_url='/auth/login/')
