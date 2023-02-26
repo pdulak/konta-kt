@@ -49,6 +49,7 @@ def nordigen_calls():
     # Get requisition_id and link to initiate authorization process with a bank
     # link = init.link  # bank authorization link
     # requisition_id = init.requisition_id
+    pass
 
 
 def get_list_of_banks():
