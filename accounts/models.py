@@ -25,6 +25,8 @@ class Account(models.Model):
     currency = models.ForeignKey(Currency, on_delete=models.PROTECT, blank=True, null=True)
     name = models.CharField(max_length=200)
     number = models.CharField(max_length=200, blank=True)
+    iban = models.CharField(max_length=200, blank=True)
+    nordigen_id = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return '{}; {}; {}'.format(self.bank.name, self.number, self.name)
