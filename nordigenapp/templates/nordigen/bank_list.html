@@ -2,18 +2,43 @@
 
 {% block main_container %}
 
+    {% if requisitions %}
+        <div class="col col-xl-6 col-lg-12">
+            <h4>Current connections and accounts</h4>
+            <ul>
+                {% for requisition in requisitions.results %}
+                    <li>
+                        <h4>{{ requisition.institution_id }}</h4>
+                        <a href="{{ requisition.link }}" target="_blank">Connect additional account</a><br>
+    {#                    {{ requisition.id }}<br>#}
+    {#                    {{ requisition.created }}<br>#}
+                        status: {{ requisition.status }}<br>
+                        <br>
+                        {% if requisition.accounts %}
+                            <h5>Accounts</h5>
+                            <ul>
+                                {% for account in requisition.accounts %}
+                                <li>{{ account }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
     {% if institutions %}
-        <ul>
-            {% for institution in institutions %}
-                <li>
-                    <div>
-{#                            <img src="{{ institution.logo }}" class="img-thumbnail" style="max-width: 200px">#}
-                        <h5>{{ institution.id }}</h5>
-                        <p>{{ institution.name }}</p>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+        <div class="col col-xl-6 col-lg-12">
+            <h4>Start requisition of additional bank</h4>
+            <ul>
+                {% for institution in institutions %}
+                    <li>
+                        <a href="/nordigen/connect_bank/{{ institution.id }}">{{ institution.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
     {% endif %}
 
 {% endblock %}

@@ -23,8 +23,8 @@ def noridgen_initialize():
         pass
     else:
         token_data = nordigen_client.generate_token()
-        logger.info(token_data)
-        logger.info(nordigen_client.token)
+        # logger.info(token_data)
+        # logger.info(nordigen_client.token)
         is_nordigen_initialized = True
     return nordigen_client
 
@@ -66,16 +66,16 @@ def initialize_bank_connection(institution_id):
         # additional layer of unique ID defined by you
         reference_id=str(uuid4())
     )
-    logger.info(init)
 
 def list_requisitions():
     client = noridgen_initialize()
-    logger.info(client.requisition.get_requisitions())
+    return client.requisition.get_requisitions()
 
 @login_required(login_url='/auth/login/')
 def bank_list(request):
     context = {
-        'institutions': get_list_of_banks()
+        'institutions': get_list_of_banks(),
+        'requisitions': list_requisitions(),
     }
     return render(request, 'nordigen/bank_list.html', context)
 
