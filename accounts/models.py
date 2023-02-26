@@ -29,7 +29,7 @@ class Account(models.Model):
     nordigen_id = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
-        return '{}; {}; {}'.format(self.bank.name, self.number, self.name)
+        return '{}; {}; {}; {}'.format(self.bank.name, self.number, self.name, self.nordigen_id)
 
     def has_account_number(self):
         return self.number != ''

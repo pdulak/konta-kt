@@ -3,6 +3,14 @@
 
     <div class="col col-xl-6 col-lg-12">
         <h4>Account: {{ account_id }}</h4>
+        {% if details.account %}
+            <ul>
+                <li>Iban: {{ details.account.iban }}</li>
+                <li>Currency: {{ details.account.currency }}</li>
+                <li>Owner: {{ details.account.ownerName }}</li>
+                <li>Type: {{ details.account.cashAccountType }}</li>
+            </ul>
+        {% endif %}
     </div>
 
 {% endblock %}

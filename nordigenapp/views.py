@@ -20,12 +20,14 @@ nordigen_client = NordigenClient(
 def noridgen_initialize():
     global is_nordigen_initialized, nordigen_client
     if (is_nordigen_initialized):
-        pass
+        logger.info('Nordigen initialized, nothing to do')
     else:
+        logger.info('Generating Nordigen token')
         token_data = nordigen_client.generate_token()
         # logger.info(token_data)
         # logger.info(nordigen_client.token)
         is_nordigen_initialized = True
+        logger.info('Nordigen initialized')
     return nordigen_client
 
 def nordigen_calls():
@@ -74,16 +76,17 @@ def list_requisitions():
 def get_account_details(account_id):
     client = noridgen_initialize()
     account = client.account_api(id=account_id)
-    return {
-        # Fetch account metadata
-        'meta_data': account.get_metadata(),
-        # Fetch details
-        'details': account.get_details(),
-        # Fetch balances
-        'balances': account.get_balances(),
-        # Fetch transactions
-        'transactions': account.get_transactions(),
-    }
+    return account.get_details()
+    # {
+    #     # Fetch account metadata
+    #     'meta_data': account.get_metadata(),
+    #     # Fetch details
+    #     'details': account.get_details(),
+    #     # Fetch balances
+    #     'balances': account.get_balances(),
+    #     # Fetch transactions
+    #     'transactions': account.get_transactions(),
+    # }
 
 @login_required(login_url='/auth/login/')
 def bank_list(request):
