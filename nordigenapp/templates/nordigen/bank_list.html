@@ -1,0 +1,19 @@
+{% extends 'dashboard/base_layout.html' %}
+
+{% block main_container %}
+
+    {% if institutions %}
+        <ul>
+            {% for institution in institutions %}
+                <li>
+                    <div>
+{#                            <img src="{{ institution.logo }}" class="img-thumbnail" style="max-width: 200px">#}
+                        <h5>{{ institution.id }}</h5>
+                        <p>{{ institution.name }}</p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+{% endblock %}
