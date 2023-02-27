@@ -21,6 +21,65 @@ nordigen_client = NordigenClient(
 )
 
 
+@login_required(login_url='/auth/login/')
+def bank_list(request):
+    context = {
+        'institutions': get_list_of_banks(),
+        'requisitions': list_requisitions(),
+        'kontakt_accounts': get_accounts_with_assignments(),
+    }
+    return render(request, 'nordigen/bank_list.html', context)
+
+
+@login_required(login_url='/auth/login/')
+def force_token_refresh(request):
+    nordigen_get_fresh_token()
+    return render(request, 'nordigen/token_refreshed.html')
+
+
+@login_required(login_url='/auth/login/')
+def index(request):
+    return render(request, 'nordigen/index.html')
+
+
+@login_required(login_url='/auth/login/')
+def log_response(request):
+    logger.info(request.POST)
+    return render(request, 'nordigen/index.html')
+
+
+@login_required(login_url='/auth/login/')
+def test(request):
+    return render(request, 'nordigen/index.html')
+
+
+@login_required(login_url='/auth/login/')
+def connect_bank(request, institution_id):
+    initialize_bank_connection(institution_id)
+    return redirect('/nordigen/bank_list')
+
+
+@login_required(login_url='/auth/login/')
+def account_details(request, account_id):
+    context = {
+        'account_id': account_id,
+        'details': get_account_details(account_id),
+        'kontakt_accounts': get_accounts_with_assignments(),
+    }
+    return render(request, 'nordigen/account.html', context)
+
+
+@login_required(login_url='/auth/login/')
+def assign_account(request, kontakt_account_id, nordigen_account_id, iban):
+    Account.objects.filter(id=kontakt_account_id).update(iban=iban, nordigen_id=nordigen_account_id)
+    return render(request, 'nordigen/account_assignment_result.html')
+
+
+def get_accounts_with_assignments():
+    return Account.objects.select_related('bank') \
+        .values('name', 'number', 'bank__name', 'id', 'nordigen_id') \
+        .order_by('bank__name', 'name')
+
 def nordigen_get_fresh_token():
     global is_nordigen_initialized, nordigen_client
     token_data = nordigen_client.generate_token()
@@ -105,63 +164,3 @@ def get_account_details(account_id):
     client = noridgen_initialize()
     account = client.account_api(id=account_id)
     return account.get_details()
-
-
-@login_required(login_url='/auth/login/')
-def bank_list(request):
-    context = {
-        'institutions': get_list_of_banks(),
-        'requisitions': list_requisitions(),
-        'kontakt_accounts': get_accounts_with_assignments(),
-    }
-    return render(request, 'nordigen/bank_list.html', context)
-
-
-@login_required(login_url='/auth/login/')
-def force_token_refresh(request):
-    nordigen_get_fresh_token()
-    return render(request, 'nordigen/token_refreshed.html')
-
-
-@login_required(login_url='/auth/login/')
-def index(request):
-    return render(request, 'nordigen/index.html')
-
-
-@login_required(login_url='/auth/login/')
-def log_response(request):
-    logger.info(request.POST)
-    return render(request, 'nordigen/index.html')
-
-
-@login_required(login_url='/auth/login/')
-def test(request):
-    return render(request, 'nordigen/index.html')
-
-
-@login_required(login_url='/auth/login/')
-def connect_bank(request, institution_id):
-    initialize_bank_connection(institution_id)
-    return redirect('/nordigen/bank_list')
-
-
-@login_required(login_url='/auth/login/')
-def account_details(request, account_id):
-    context = {
-        'account_id': account_id,
-        'details': get_account_details(account_id),
-        'kontakt_accounts': get_accounts_with_assignments(),
-    }
-    return render(request, 'nordigen/account.html', context)
-
-
-@login_required(login_url='/auth/login/')
-def assign_account(request, kontakt_account_id, nordigen_account_id, iban):
-    Account.objects.filter(id=kontakt_account_id).update(iban=iban, nordigen_id=nordigen_account_id)
-    return render(request, 'nordigen/account_assignment_result.html')
-
-
-def get_accounts_with_assignments():
-    return Account.objects.select_related('bank') \
-        .values('name', 'number', 'bank__name', 'id', 'nordigen_id') \
-        .order_by('bank__name', 'name')
