@@ -4,9 +4,12 @@ from django.conf import settings
 from uuid import uuid4
 from nordigen import NordigenClient
 from loguru import logger
+from datetime import datetime
 import environ
+import time
 import os
 
+from .models import NordigenTokens
 from accounts.models import Account
 
 is_nordigen_initialized = False
@@ -18,42 +21,62 @@ nordigen_client = NordigenClient(
 )
 
 
+def nordigen_get_fresh_token():
+    global is_nordigen_initialized, nordigen_client
+    token_data = nordigen_client.generate_token()
+    NordigenTokens.objects.create(
+        access=token_data["access"],
+        refresh=token_data["refresh"],
+        access_expiration=datetime.fromtimestamp(time.time() + token_data["access_expires"]),
+        refresh_expiration=datetime.fromtimestamp(time.time() + token_data["refresh_expires"])
+    )
+    is_nordigen_initialized = True
+
+
+def nordigen_exchange_token(refresh_token, refresh_expiration):
+    global is_nordigen_initialized, nordigen_client
+    token_data = nordigen_client.exchange_token(refresh_token)
+    logger.info(token_data)
+    NordigenTokens.objects.create(
+        access=token_data["access"],
+        refresh=refresh_token,
+        access_expiration=datetime.fromtimestamp(time.time() + token_data["access_expires"]),
+        refresh_expiration=refresh_expiration
+    )
+    is_nordigen_initialized = True
+
+
 def noridgen_initialize():
     global is_nordigen_initialized, nordigen_client
+
     if (is_nordigen_initialized):
         logger.info('Nordigen initialized, nothing to do')
+        return nordigen_client
     else:
         logger.info('Generating Nordigen token')
-        token_data = nordigen_client.generate_token()
-        # logger.info(token_data)
-        # logger.info(nordigen_client.token)
-        is_nordigen_initialized = True
-        logger.info('Nordigen initialized')
+        last_token = NordigenTokens.objects.order_by('-id')[:1]
+        if (last_token.exists()):
+            for token in last_token:
+                if token.access_expiration.timestamp() > time.time():
+                    # token is fresh
+                    logger.info("Stored Nordigen token is fresh")
+                    nordigen_client.token = token.access
+                    is_nordigen_initialized = True
+                    return nordigen_client
+                elif token.refresh_expiration.timestamp() > time.time():
+                    # refresh token
+                    logger.info("Stored Nordigen token is old, but can be refreshed")
+                    nordigen_exchange_token(token.refresh, token.refresh_expiration)
+                    return nordigen_client
+                else:
+                    # everything too old, create a new one
+                    nordigen_get_fresh_token()
+        else:
+            # not exists in the DB
+            nordigen_get_fresh_token()
+
+    logger.info('Nordigen initialized')
     return nordigen_client
-
-
-def nordigen_calls():
-    #
-    # https://github.com/nordigen/nordigen-python
-    #
-
-    # Exchange refresh token for new access token
-    # new_token = client.exchange_token(token_data["refresh"])
-
-    # Initialize bank session
-    # init = client.initialize_session(
-    #     # institution id
-    #     institution_id=institution_id,
-    #     # redirect url after successful authentication
-    #     redirect_uri="https://nordigen.com",
-    #     # additional layer of unique ID defined by you
-    #     reference_id=str(uuid4())
-    # )
-
-    # Get requisition_id and link to initiate authorization process with a bank
-    # link = init.link  # bank authorization link
-    # requisition_id = init.requisition_id
-    pass
 
 
 def get_list_of_banks():
@@ -82,16 +105,6 @@ def get_account_details(account_id):
     client = noridgen_initialize()
     account = client.account_api(id=account_id)
     return account.get_details()
-    # {
-    #     # Fetch account metadata
-    #     'meta_data': account.get_metadata(),
-    #     # Fetch details
-    #     'details': account.get_details(),
-    #     # Fetch balances
-    #     'balances': account.get_balances(),
-    #     # Fetch transactions
-    #     'transactions': account.get_transactions(),
-    # }
 
 
 @login_required(login_url='/auth/login/')
@@ -135,10 +148,12 @@ def account_details(request, account_id):
     }
     return render(request, 'nordigen/account.html', context)
 
+
 @login_required(login_url='/auth/login/')
 def assign_account(request, kontakt_account_id, nordigen_account_id, iban):
     Account.objects.filter(id=kontakt_account_id).update(iban=iban, nordigen_id=nordigen_account_id)
     return render(request, 'nordigen/account_assignment_result.html')
+
 
 def get_accounts_with_assignments():
     return Account.objects.select_related('bank') \
