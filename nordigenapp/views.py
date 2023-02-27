@@ -118,6 +118,12 @@ def bank_list(request):
 
 
 @login_required(login_url='/auth/login/')
+def force_token_refresh(request):
+    nordigen_get_fresh_token()
+    return render(request, 'nordigen/token_refreshed.html')
+
+
+@login_required(login_url='/auth/login/')
 def index(request):
     return render(request, 'nordigen/index.html')
 
