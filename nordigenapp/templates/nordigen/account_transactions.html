@@ -1,0 +1,39 @@
+{% extends 'dashboard/base_layout.html' %}
+{% load static %}
+{% block main_container %}
+
+    <div class="col col-xl-6 col-lg-12">
+        <h4>
+            Account: {{ account_id }}
+        </h4>
+        {% if transactions.transactions %}
+            <ul>
+                {% for booked in transactions.transactions.booked %}
+                    <li>
+                        bookingDate: <strong>{{ booked.bookingDate }}</strong><br>
+                        creditorName: <strong>{{ booked.creditorName }}</strong><br>
+                        debtorName: <strong>{{ booked.debtorName }}</strong><br>
+                        internalTransactionId: <strong>{{ booked.internalTransactionId }}</strong><br>
+                        transactionAmount: <strong>{{ booked.transactionAmount.amount }} {{ bookied.transactionAmount.currency }}</strong><br>
+                        transactionId: <strong>{{ booked.transactionId }}</strong><br>
+                        valueDate: <strong>{{ booked.valueDate }}</strong><br>
+                        {% if booked.remittanceInformationUnstructuredArray %}
+                            <ul>
+                                {% for remit in booked.remittanceInformationUnstructuredArray %}
+                                    <li>{{ remit }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        {% if booked.remittanceInformationUnstructured %}
+                            <ul>
+                                <li>REMIT: <strong>{{ booked.remittanceInformationUnstructured }}</strong></li>
+                            </ul>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+    </div>
+
+{% endblock %}

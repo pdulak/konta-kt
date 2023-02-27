@@ -3,7 +3,10 @@
 {% block main_container %}
 
     <div class="col col-xl-6 col-lg-12">
-        <h4>Account: {{ account_id }}</h4>
+        <h4>
+            Account: {{ account_id }}<br>
+            <a href="/nordigen/account_transactions/{{ account_id }}/">Account transactions</a>
+        </h4>
         {% if details.account %}
             <ul>
                 <li>Iban: {{ details.account.iban }}</li>

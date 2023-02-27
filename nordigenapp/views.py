@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.http import JsonResponse
 from uuid import uuid4
 from nordigen import NordigenClient
 from loguru import logger
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 import environ
 import time
 import os
@@ -73,6 +75,16 @@ def account_details(request, account_id):
 def assign_account(request, kontakt_account_id, nordigen_account_id, iban):
     Account.objects.filter(id=kontakt_account_id).update(iban=iban, nordigen_id=nordigen_account_id)
     return render(request, 'nordigen/account_assignment_result.html')
+
+
+@login_required(login_url='/auth/login/')
+def account_transactions(request, account_id):
+    context = {
+        'account_id': account_id,
+        'transactions': get_account_transactions(account_id)
+    }
+    return render(request, 'nordigen/account_transactions.html', context)
+    # return JsonResponse(get_account_transactions(account_id))
 
 
 def get_accounts_with_assignments():
@@ -164,3 +176,10 @@ def get_account_details(account_id):
     client = noridgen_initialize()
     account = client.account_api(id=account_id)
     return account.get_details()
+
+
+def get_account_transactions(account_id):
+    client = noridgen_initialize()
+    account = client.account_api(id=account_id)
+    start_date = (datetime.now() - relativedelta(days=5)).strftime("%Y-%m-%d")
+    return account.get_transactions(date_from=start_date)

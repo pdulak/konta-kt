@@ -10,6 +10,7 @@ urlpatterns = [
     path('force_token_refresh/', views.force_token_refresh, name='nordigen_force_token_refresh'),
     path('connect_bank/<str:institution_id>/', views.connect_bank, name='nordigen_connect_bank'),
     path('account_details/<str:account_id>/', views.account_details, name='nordigen_account_details'),
+    path('account_transactions/<str:account_id>/', views.account_transactions, name='nordigen_account_transactions'),
     path('assign_account/<int:kontakt_account_id>/<str:nordigen_account_id>/<str:iban>/', views.assign_account,
          name='nordigen_assign_account'),
 ]
