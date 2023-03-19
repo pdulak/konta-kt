@@ -83,6 +83,31 @@ def account_transactions(request, account_id):
         'account_id': account_id,
         'transactions': get_account_transactions(account_id)
     }
+
+    for boo in context['transactions']['transactions']['booked']:
+        boo['transactionAmount']['amount'] = float(boo['transactionAmount']['amount'])
+        logger.info(boo)
+        if boo['transactionAmount']['amount'] < 0:
+            boo['isExpenditure'] = True
+            if 'creditorName' in boo.keys():
+                boo['party'] = boo['creditorName']
+            elif 'remittanceInformationUnstructured' in boo.keys():
+                boo['party'] = boo['remittanceInformationUnstructured']
+            elif 'remittanceInformationUnstructuredArray' in boo.keys():
+                boo['party'] = " ".join(boo['remittanceInformationUnstructuredArray'])
+            else:
+                boo['party'] = 'No creditor'
+        else:
+            boo['isExpenditure'] = False
+            if 'debtorName' in boo.keys():
+                boo['party'] = boo['debtorName']
+            elif 'remittanceInformationUnstructured' in boo.keys():
+                boo['party'] = boo['remittanceInformationUnstructured']
+            elif 'remittanceInformationUnstructuredArray' in boo.keys():
+                boo['party'] = " ".join(boo['remittanceInformationUnstructuredArray'])
+            else:
+                boo['party'] = 'No debtor'
+
     return render(request, 'nordigen/account_transactions.html', context)
     # return JsonResponse(get_account_transactions(account_id))
 
@@ -178,8 +203,8 @@ def get_account_details(account_id):
     return account.get_details()
 
 
-def get_account_transactions(account_id):
+def get_account_transactions(account_id, days=20):
     client = noridgen_initialize()
     account = client.account_api(id=account_id)
-    start_date = (datetime.now() - relativedelta(days=5)).strftime("%Y-%m-%d")
+    start_date = (datetime.now() - relativedelta(days=days)).strftime("%Y-%m-%d")
     return account.get_transactions(date_from=start_date)

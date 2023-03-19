@@ -2,36 +2,52 @@
 {% load static %}
 {% block main_container %}
 
-    <div class="col col-xl-6 col-lg-12">
+    <div class="col col-xl-12 col-lg-12">
         <h4>
             Account: {{ account_id }}
         </h4>
         {% if transactions.transactions %}
-            <ul>
-                {% for booked in transactions.transactions.booked %}
-                    <li>
-                        bookingDate: <strong>{{ booked.bookingDate }}</strong><br>
-                        creditorName: <strong>{{ booked.creditorName }}</strong><br>
-                        debtorName: <strong>{{ booked.debtorName }}</strong><br>
-                        internalTransactionId: <strong>{{ booked.internalTransactionId }}</strong><br>
-                        transactionAmount: <strong>{{ booked.transactionAmount.amount }} {{ bookied.transactionAmount.currency }}</strong><br>
-                        transactionId: <strong>{{ booked.transactionId }}</strong><br>
-                        valueDate: <strong>{{ booked.valueDate }}</strong><br>
-                        {% if booked.remittanceInformationUnstructuredArray %}
-                            <ul>
-                                {% for remit in booked.remittanceInformationUnstructuredArray %}
-                                    <li>{{ remit }}</li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                        {% if booked.remittanceInformationUnstructured %}
-                            <ul>
-                                <li>REMIT: <strong>{{ booked.remittanceInformationUnstructured }}</strong></li>
-                            </ul>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
+            <table>
+                <thead>
+                    <tr>
+                        <th>booking Date</th>
+                        <th>Value date</th>
+                        <th>Party name</th>
+                        <th>Internal ID</th>
+                        <th>Amount</th>
+                        <th>Remittance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booked in transactions.transactions.booked %}
+                        <tr {% if booked.isExpenditure %}style="background-color: pink"{% else %}style="background-color: darkseagreen"{% endif %} >
+                            <td>{{ booked.bookingDate }}</td>
+                            <td>{{ booked.valueDate }}</td>
+                            <td>
+                                {{ booked.party }}
+                            </td>
+                            <td>{{ booked.internalTransactionId }}</td>
+                            <td>{{ booked.transactionAmount.amount }} {{ booked.transactionAmount.currency }}</td>
+                            <td>
+                                {% if booked.remittanceInformationUnstructuredArray %}
+                                    Unstrucdtured Array: <br>
+                                    <ul>
+                                        {% for remit in booked.remittanceInformationUnstructuredArray %}
+                                            <li>{{ remit }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                                {% if booked.remittanceInformationUnstructured %}
+                                    Unstructured: <br>
+                                    <ul>
+                                        <li>REMIT: <strong>{{ booked.remittanceInformationUnstructured }}</strong></li>
+                                    </ul>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         {% endif %}
 
     </div>
