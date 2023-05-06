@@ -47,6 +47,8 @@ class Transaction(models.Model):
     party_IBAN = models.CharField(max_length=200, blank=True, null=True)
     irrelevant = models.BooleanField(default=False, blank=True, null=True)
     approved = models.BooleanField(default=False, blank=True, null=True)
+    transaction_id = models.CharField(max_length=200, blank=True, null=True)
+    import_source = models.CharField(max_length=20, blank=True, null=False, default='CSV')
 
     def __str__(self):
         return '{}; {}; {}; {} PLN; {} {}'.format(self.description, self.imported_description, str(self.date),
@@ -70,6 +72,8 @@ class TransactionImportTemp(models.Model):
     party_name = models.CharField(max_length=500, blank=True, null=True)
     party_IBAN = models.CharField(max_length=200, blank=True, null=True)
     is_duplicate = models.BooleanField(default=False, blank=True, null=True)
+    transaction_id = models.CharField(max_length=200, blank=True, null=True)
+    import_source = models.CharField(max_length=20, blank=True, null=False, default='CSV')
 
     def __str__(self):
         return '{}; {}; {} PLN; {} {}'.format(self.imported_description, str(self.date), str(self.amount),
