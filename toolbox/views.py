@@ -15,6 +15,9 @@ from transactions.models import CategoryGroup, Category, TransactionType, Transa
 
 from loguru import logger
 
+from accounts.models import Account
+from json2html import *
+
 @login_required(login_url='/auth/login/')
 def index(request):
     return HttpResponse("Hello, world. You're at the toolbox index.")
@@ -69,19 +72,21 @@ def load_kontomierz(request):
 @login_required(login_url='/auth/login/')
 def load_mbank(request):
     df = mbank.load_csv()
+    df['isNordigen'] = 0
 
-    common.do_import(df)
+    # common.do_import(df)
 
-    return HttpResponse("Loaded mBank CSV;")
+    return HttpResponse(df.to_html())
 
 
 @login_required(login_url='/auth/login/')
 def load_alior(request):
     df = alior.load_csv()
+    df['isNordigen'] = 0
 
-    common.do_import(df)
+    # common.do_import(df)
 
-    return HttpResponse("Loaded Alior CSV;")
+    return HttpResponse(df.to_html())
 
 
 @login_required(login_url='/auth/login/')
@@ -94,3 +99,16 @@ def do_cleanup(request):
     common.do_cleanup()
 
     return HttpResponse("Cleanup performed");
+
+
+@login_required(login_url='/auth/login/')
+def load_nordigen(request):
+    context = {
+        'accounts' : Account.objects.select_related('bank') \
+        .exclude(nordigen_id__isnull=True) \
+        .exclude(nordigen_id__exact='') \
+        .values('name', 'bank__name', 'nordigen_id') \
+        .order_by('bank__name', 'name')
+    }
+
+    return render(request, 'toolbox/load_nordigen.html', context)

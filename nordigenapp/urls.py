@@ -11,6 +11,7 @@ urlpatterns = [
     path('connect_bank/<str:institution_id>/', views.connect_bank, name='nordigen_connect_bank'),
     path('account_details/<str:account_id>/', views.account_details, name='nordigen_account_details'),
     path('account_transactions/<str:account_id>/', views.account_transactions, name='nordigen_account_transactions'),
+    path('account_transactions_json/<str:account_id>/', views.account_transactions_json, name='nordigen_account_transactions_json'),
     path('assign_account/<int:kontakt_account_id>/<str:nordigen_account_id>/<str:iban>/', views.assign_account,
          name='nordigen_assign_account'),
 ]

@@ -1,0 +1,54 @@
+{% extends 'dashboard/base_layout.html' %}
+
+{% block main_container %}
+
+    <div class="col col-12">
+        <h2>Accounts linked to Nordigen</h2>
+    </div>
+
+    <div class="col col-12">
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Bank</th>
+                    <th>Account</th>
+                    <th>Nordigen ID</th>
+                    <th>Loaded</th>
+                    <th>Imported</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in accounts %}
+                    <tr data-nordigen="{{ account.nordigen_id }}">
+                        <td>{{ account.bank__name }}</td>
+                        <td>{{ account.name }}</td>
+                        <td>{{ account.nordigen_id }}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        rows = document.querySelectorAll('tr[data-nordigen]');
+        rows.forEach(row => {
+            nordigen_id = row.getAttribute('data-nordigen');
+            row.querySelector('td:nth-child(4)').setAttribute('aria-busy', 'true');
+            row.querySelector('td:nth-child(5)').setAttribute('aria-busy', 'true');
+
+            fetch('/nordigen/account_transactions_json/' + nordigen_id)
+                .then(response => response.json())
+                .then(data => {
+                    row.querySelector('td:nth-child(4)').innerHTML = `loaded ${data.length} transactions`;
+                    row.querySelector('td:nth-child(4)').setAttribute('aria-busy', 'false');
+                })
+                .catch(err => {
+                    row.querySelector('td:nth-child(4)').innerHTML = err;
+                    row.querySelector('td:nth-child(4)').setAttribute('aria-busy', 'false');
+                });
+        });
+    </script>
+
+{% endblock %}
