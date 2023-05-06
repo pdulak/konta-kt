@@ -38,11 +38,18 @@
             row.querySelector('td:nth-child(4)').setAttribute('aria-busy', 'true');
             row.querySelector('td:nth-child(5)').setAttribute('aria-busy', 'true');
 
-            fetch('/nordigen/account_transactions_json/' + nordigen_id)
+            fetch('/nordigen/account_transactions_json/' + nordigen_id + '/')
                 .then(response => response.json())
                 .then(data => {
                     row.querySelector('td:nth-child(4)').innerHTML = `loaded ${data.length} transactions`;
                     row.querySelector('td:nth-child(4)').setAttribute('aria-busy', 'false');
+                    nordigen_id = row.getAttribute('data-nordigen');
+                    return fetch('/nordigen/account_transactions_import/' + nordigen_id + '/')
+                })
+                .then(response => response.text())
+                .then(html => {
+                    row.querySelector('td:nth-child(5)').innerHTML = html;
+                    row.querySelector('td:nth-child(5)').setAttribute('aria-busy', 'false');
                 })
                 .catch(err => {
                     row.querySelector('td:nth-child(4)').innerHTML = err;

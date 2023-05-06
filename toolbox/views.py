@@ -72,21 +72,23 @@ def load_kontomierz(request):
 @login_required(login_url='/auth/login/')
 def load_mbank(request):
     df = mbank.load_csv()
-    df['isNordigen'] = 0
+    df['import_source'] = 'CSV'
+    df['Transaction ID'] = ''
 
-    # common.do_import(df)
+    df_duplicates, df_imported = common.do_import(df)
 
-    return HttpResponse(df.to_html())
+    return HttpResponse(f"Imported: {df_imported.shape[0]}, Duplicates: {df_duplicates.shape[0]}")
 
 
 @login_required(login_url='/auth/login/')
 def load_alior(request):
     df = alior.load_csv()
-    df['isNordigen'] = 0
+    df['import_source'] = 'CSV'
+    df['Transaction ID'] = ''
 
-    # common.do_import(df)
+    df_duplicates, df_imported = common.do_import(df)
 
-    return HttpResponse(df.to_html())
+    return HttpResponse(f"Imported: {df_imported.shape[0]}, Duplicates: {df_duplicates.shape[0]}")
 
 
 @login_required(login_url='/auth/login/')

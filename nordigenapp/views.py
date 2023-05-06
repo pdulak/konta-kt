@@ -17,6 +17,11 @@ from json2html import *
 from .models import NordigenTokens
 from accounts.models import Account
 
+import sys
+import os.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from toolbox import common
+
 is_nordigen_initialized = False
 env = environ.Env()
 environ.Env.read_env(os.path.join(settings.BASE_DIR, '.env'))
@@ -84,9 +89,9 @@ def assign_account(request, kontakt_account_id, nordigen_account_id, iban):
 def account_transactions(request, account_id):
     context = {
         'account_id': account_id,
-        'account_name' : '',
-        'account_number' : '',
-        'transactions': read_account_transactions_from_file_or_API(account_id)
+        'account_name': '',
+        'account_number': '',
+        'transactions': read_account_transactions_from_file_or_api(account_id)
     }
     for this_account in Account.objects.filter(nordigen_id=account_id):
         context['account_name'] = this_account.name
@@ -100,11 +105,27 @@ def account_transactions(request, account_id):
 
 @login_required(login_url='/auth/login/')
 def account_transactions_json(request, account_id):
-    context = read_account_transactions_from_file_or_API(account_id)
+    context = read_account_transactions_from_file_or_api(account_id)
 
     return JsonResponse(context['transactions']['booked'], safe=False)
 
-def read_account_transactions_from_file_or_API(account_id):
+
+@login_required(login_url='/auth/login/')
+def account_transactions_import(request, account_id):
+    transactions = read_account_transactions_from_file_or_api(account_id)
+    account_number = ''
+    for this_account in Account.objects.filter(nordigen_id=account_id):
+        account_number = this_account.number
+
+    df = convert_transactions_to_dataframe(account_id, account_number,
+                                           transactions['transactions']['booked'])
+
+    df_duplicates, df_imported = common.do_import(df)
+
+    return HttpResponse(f"Imported: {df_imported.shape[0]}, Duplicates: {df_duplicates.shape[0]}")
+
+
+def read_account_transactions_from_file_or_api(account_id):
     source_dir = os.path.join(settings.BASE_DIR, 'temp')
     file_name = datetime.today().strftime('%Y-%m-%d---') + account_id + '.json'
     file_path = os.path.join(source_dir, file_name)
@@ -183,13 +204,14 @@ def convert_transactions_to_dataframe(account_id, account_number, transactions):
                             boo['transactionAmount']['amount'],
                             balance,
                             boo['internalTransactionId'],
-                            1
+                            'Nordigen'
                             ]
 
         data.append(this_transaction)
 
     field_names = ['Date', 'Added', 'Description', 'Amount', 'Balance', 'Source', 'Type', 'Party Name', 'Party IBAN',
-                   'Account Number', 'Date Modified', 'Amount Modified', 'Balance Modified', 'Transaction ID', 'isNordigen']
+                   'Account Number', 'Date Modified', 'Amount Modified', 'Balance Modified', 'Transaction ID',
+                   'import_source']
 
     return pd.DataFrame(data, columns=field_names)
 
@@ -198,6 +220,7 @@ def get_accounts_with_assignments():
     return Account.objects.select_related('bank') \
         .values('name', 'number', 'bank__name', 'id', 'nordigen_id') \
         .order_by('bank__name', 'name')
+
 
 def nordigen_get_fresh_token():
     global is_nordigen_initialized, nordigen_client
@@ -227,13 +250,13 @@ def nordigen_exchange_token(refresh_token, refresh_expiration):
 def noridgen_initialize():
     global is_nordigen_initialized, nordigen_client
 
-    if (is_nordigen_initialized):
+    if is_nordigen_initialized:
         logger.info('Nordigen initialized, nothing to do')
         return nordigen_client
     else:
         logger.info('Generating Nordigen token')
         last_token = NordigenTokens.objects.order_by('-id')[:1]
-        if (last_token.exists()):
+        if last_token.exists():
             for token in last_token:
                 if token.access_expiration.timestamp() > time.time():
                     # token is fresh
@@ -264,7 +287,7 @@ def get_list_of_banks():
 
 def initialize_bank_connection(institution_id):
     client = noridgen_initialize()
-    init = client.initialize_session(
+    client.initialize_session(
         # institution id
         institution_id=institution_id,
         # redirect url after successful authentication
