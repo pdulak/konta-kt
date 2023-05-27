@@ -41,6 +41,11 @@ def bank_list(request):
     return render(request, 'nordigen/bank_list.html', context)
 
 
+def delete_requisition(request, requisition_id):
+    delete_requisition_from_nordigen(requisition_id)
+    return redirect('/nordigen/bank_list')
+
+
 @login_required(login_url='/auth/login/')
 def force_token_refresh(request):
     nordigen_get_fresh_token()
@@ -313,3 +318,8 @@ def get_account_transactions(account_id, days=20):
     account = client.account_api(id=account_id)
     start_date = (datetime.now() - relativedelta(days=days)).strftime("%Y-%m-%d")
     return account.get_transactions(date_from=start_date)
+
+
+def delete_requisition_from_nordigen(requisition_id):
+    client = noridgen_initialize()
+    return client.requisition.delete_requisition(requisition_id)

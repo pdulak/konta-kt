@@ -9,7 +9,9 @@
                 {% for requisition in requisitions.results %}
                     <li style="margin-bottom: 40px">
                         <h4>{{ requisition.institution_id }}</h4>
-                        <a href="{{ requisition.link }}" target="_blank">Connect additional account</a><br>
+                        <a href="{{ requisition.link }}" target="_blank">Connect additional account</a>
+                        <a href="/nordigen/delete_requisition/{{ requisition.id }}" style="color: #f00">Delete requisition</a>
+                        <br>
     {#                    {{ requisition.id }}<br>#}
     {#                    {{ requisition.created }}<br>#}
                         status: {{ requisition.status }}<br>

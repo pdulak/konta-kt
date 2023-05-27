@@ -15,4 +15,5 @@ urlpatterns = [
     path('account_transactions_import/<str:account_id>/', views.account_transactions_import, name='nordigen_account_transactions_import'),
     path('assign_account/<int:kontakt_account_id>/<str:nordigen_account_id>/<str:iban>/', views.assign_account,
          name='nordigen_assign_account'),
+    path('delete_requisition/<str:requisition_id>/', views.delete_requisition, name='nordigen_delete_requisition'),
 ]
