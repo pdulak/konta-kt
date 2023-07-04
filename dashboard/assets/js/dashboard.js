@@ -5,7 +5,7 @@ Date.prototype.yyyymmdd = function() {
     return "".concat(yyyy).concat("-").concat(mm).concat("-").concat(dd);
 };
 
-function fill_transaction_row(e, rowToFill) {
+function fill_transaction_row(e, rowToFill, sums) {
     // date
     dateCell = document.createElement("td");
     $(dateCell).html(e.date + '<div class="buttons"><button onclick="transaction_menu(' + e.id + '); return false;" class="btn btn-light btn-sm">&#9874;</button>'
@@ -38,6 +38,19 @@ function fill_transaction_row(e, rowToFill) {
     }
     rowToFill.appendChild(amountCell);
 
+    // adjust sums
+    if ((+e.amount) > 0) {
+        sums.up += +e.amount;
+        if (!e.irrelevant) {
+            sums.upRelevant += +e.amount;
+        }
+    } else {
+        sums.down += +e.amount;
+        if (!e.irrelevant) {
+            sums.downRelevant += +e.amount;
+        }
+    }
+
     return rowToFill;
 }
 
@@ -52,6 +65,12 @@ function fill_transactions(data) {
 
     bodyToFill.empty();
     transactions = [];
+    sums = {
+        up : 0,
+        down : 0,
+        upRelevant : 0,
+        downRelevant : 0,
+    };
 
     t.forEach(function(e){
         transactions[e.id] = e;
@@ -64,10 +83,15 @@ function fill_transactions(data) {
             lastDate = e.date;
         }
 
-        thisRow = fill_transaction_row(e, thisRow);
+        thisRow = fill_transaction_row(e, thisRow, sums);
 
         bodyToFill.append(thisRow);
     });
+
+    document.querySelector('#transactions_table span.up').innerHTML = sums.up.toFixed(2);
+    document.querySelector('#transactions_table span.down').innerHTML = sums.down.toFixed(2);
+    document.querySelector('#transactions_table span.upRelevant').innerHTML = sums.upRelevant.toFixed(2);
+    document.querySelector('#transactions_table span.downRelevant').innerHTML = sums.downRelevant.toFixed(2);
 }
 
 function load_transactions() {

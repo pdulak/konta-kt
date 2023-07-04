@@ -143,6 +143,26 @@ body {
     line-height: 100%;
 }
 
+#transactions_table span.up {
+    color: #196400;
+    font-weight: normal;
+}
+
+#transactions_table span.down {
+    color: #610600;
+    font-weight: normal;
+}
+
+#transactions_table span.upRelevant {
+    color: #196400;
+    font-weight: bold;
+}
+
+#transactions_table span.downRelevant {
+    color: #610600;
+    font-weight: bold;
+}
+
 #transactions_table tr td:first-child {
     width: 90px;
 }

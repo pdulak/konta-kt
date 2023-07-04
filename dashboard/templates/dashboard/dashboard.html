@@ -33,10 +33,10 @@
         </div>
         <div class="form-row mt-2">
             <div class="col">
-                <input type="text" class="form-control form-control-sm" placeholder="od daty" name="start_date">
+                <input type="date" class="form-control form-control-sm" placeholder="od daty" name="start_date">
             </div>
             <div class="col">
-                <input type="text" class="form-control form-control-sm" placeholder="do daty" name="end_date">
+                <input type="date" class="form-control form-control-sm" placeholder="do daty" name="end_date">
             </div>
             <div class="col">
                 <button onclick="load_transactions(); load_months(); return false;" class="btn btn-primary btn-sm">&#x21bb;</button>
@@ -54,7 +54,11 @@
             <thead>
                 <tr>
                     <th class="date-header activeUp">Date</th>
-                    <th>Description</th>
+                    <th>Description (Summary:
+                        <span class="upRelevant"></span>;
+                        <span class="downRelevant"></span>;
+                        <span class="up"></span>;
+                        <span class="down"></span>)</th>
                     <th class="text-right amount-header">Amount</th>
                 </tr>
             </thead>
