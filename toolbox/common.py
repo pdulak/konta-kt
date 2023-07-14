@@ -41,11 +41,13 @@ def do_import(df):
                 # check for transaction duplicate
                 is_duplicate = False
 
+                if accounts_numbers[row['Account Number']].id == 255:
+                    logger.info("Checking for duplicates")
+
                 if row['import_source'] == 'Nordigen':
                     chk_transaction_nordigen = Transaction.objects.filter(date=row['Date Modified'][:10],
                                                                      account=accounts_numbers[row['Account Number']],
                                                                      amount_account_currency=row['Amount Modified'],
-                                                                     transaction_id=row['Transaction ID'],
                                                                      import_source='Nordigen'
                                                                  ) \
                         .exclude(import_header=import_headers[row['Source']]) \
@@ -58,6 +60,15 @@ def do_import(df):
                         .exclude(import_source='Nordigen')\
                         .exclude(import_header=import_headers[row['Source']])\
                         .count()
+
+                    if accounts_numbers[row['Account Number']].id == 255:
+                        logger.info("Nordigen: {}, CSV: {}".format(chk_transaction_nordigen, chk_transaction_csv))
+                        logger.info(Transaction.objects.filter(date=row['Date Modified'][:10],
+                                                                     account=accounts_numbers[row['Account Number']],
+                                                                     amount_account_currency=row['Amount Modified'],
+                                                                     import_source='Nordigen'
+                                                                 ) \
+                        .exclude(import_header=import_headers[row['Source']]))
                 else:
                     chk_transaction_nordigen = Transaction.objects.filter(date=row['Date Modified'][:10],
                                                                           account=accounts_numbers[
@@ -79,12 +90,21 @@ def do_import(df):
                         .exclude(import_header=import_headers[row['Source']]) \
                         .count()
 
+                    if accounts_numbers[row['Account Number']].id == 255:
+                        logger.info("Nordigen s: {}, CSV: {}".format(chk_transaction_nordigen, chk_transaction_csv))
+
                 chk_transaction = chk_transaction_nordigen + chk_transaction_csv
 
                 if chk_transaction:
+                    if accounts_numbers[row['Account Number']].id == 255:
+                        logger.info("Duplicate found")
+                        logger.info(row)
                     is_duplicate = True
                     duplicates.append(row)
                 else:
+                    if accounts_numbers[row['Account Number']].id == 255:
+                        logger.info("Not duplicate")
+                        logger.info(row)
                     # insert if not duplicate
                     imported.append(row)
                     Transaction.objects.create(
