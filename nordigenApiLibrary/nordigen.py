@@ -4,15 +4,15 @@ from typing import Dict, Final, Optional
 import requests
 from requests.models import HTTPError, Response
 
-from nordigen.api import (
+from nordigenApiLibrary.api import (
     AccountApi,
     AgreementsApi,
     InstitutionsApi,
     RequisitionsApi,
 )
-from nordigen.utils.filter import DataFilter
-from nordigen.types.http_enums import HTTPMethod
-from nordigen.types.types import RequisitionDto, TokenType
+from nordigenApiLibrary.utils.filter import DataFilter
+from nordigenApiLibrary.types.http_enums import HTTPMethod
+from nordigenApiLibrary.types.types import RequisitionDto, TokenType
 
 
 class NordigenClient:

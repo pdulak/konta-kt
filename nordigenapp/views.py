@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from uuid import uuid4
-from nordigen import NordigenClient
+from nordigenApiLibrary import NordigenClient
 from loguru import logger
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
