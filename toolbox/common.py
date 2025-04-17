@@ -144,6 +144,97 @@ def do_import(df):
 
     return df_duplicates, df_imported
 
+def upload_to_b2(file_path, bucket_id=None):
+    """
+    Upload a file to Backblaze B2 storage.
+
+    Args:
+        file_path (str): Path to the file to upload
+        bucket_id (str, optional): B2 bucket ID. If None, will use BUCKET_ID from environment variables.
+
+    Returns:
+        bool: True if upload was successful, False otherwise
+    """
+    # Load environment variables if not already loaded
+    load_dotenv()
+
+    try:
+        # Get B2 credentials from environment variables
+        key_id = os.environ.get('KEY_ID_PRIVATE')
+        application_key = os.environ.get('APPLICATION_KEY_PRIVATE')
+        bucket_id = bucket_id or os.environ.get('BUCKET_ID')
+
+        if not key_id or not application_key or not bucket_id:
+            logger.warning("B2 credentials not found in environment variables. Skipping upload.")
+            return False
+
+        # Step 1: Authenticate and get authorization token
+        auth_string = f"{key_id}:{application_key}"
+        auth_encoded = base64.b64encode(auth_string.encode()).decode()
+
+        auth_response = requests.get(
+            "https://api.backblazeb2.com/b2api/v2/b2_authorize_account",
+            headers={"Authorization": f"Basic {auth_encoded}"}
+        )
+
+        if auth_response.status_code != 200:
+            logger.error(f"B2 authentication failed: {auth_response.text}")
+            return False
+
+        auth_data = auth_response.json()
+        auth_token = auth_data['authorizationToken']
+        api_url = auth_data['apiUrl']
+        download_url = auth_data['downloadUrl']
+
+        # Step 2: Get upload URL
+        get_upload_url_response = requests.get(
+            f"{api_url}/b2api/v2/b2_get_upload_url",
+            headers={
+                "Authorization": auth_token
+            },
+            params={"bucketId": bucket_id}
+        )
+
+        if get_upload_url_response.status_code != 200:
+            logger.error(f"Failed to get upload URL: {get_upload_url_response.text}")
+            return False
+
+        upload_data = get_upload_url_response.json()
+        upload_url = upload_data['uploadUrl']
+        upload_auth_token = upload_data['authorizationToken']
+
+        # Step 3: Upload the file
+        filename = os.path.basename(file_path)
+        logger.info(f"Uploading {filename} to B2 bucket {bucket_id}")
+
+        with open(file_path, 'rb') as file:
+            file_data = file.read()
+
+        # Calculate SHA1 hash
+        sha1_hash = hashlib.sha1(file_data).hexdigest()
+
+        upload_response = requests.post(
+            upload_url,
+            headers={
+                "Authorization": upload_auth_token,
+                "X-Bz-File-Name": filename,
+                "Content-Type": "application/octet-stream",
+                "X-Bz-Content-Sha1": sha1_hash
+            },
+            data=file_data
+        )
+
+        if upload_response.status_code == 200:
+            logger.info("Upload to B2 completed successfully")
+            return True
+        else:
+            logger.error(f"Upload failed: {upload_response.text}")
+            return False
+    except Exception as e:
+        logger.error(f"Error uploading to B2: {str(e)}")
+        return False
+
+
 def do_cleanup():
     # Load environment variables from .env file
     load_dotenv()
@@ -171,75 +262,5 @@ def do_cleanup():
         logger.info("Copying {} to {}".format(this_file, dest_file))
         shutil.copyfile(this_file, dest_file)
 
-        # Upload the backup file to Backblaze B2 using direct API calls
-        try:
-            # Get B2 credentials from environment variables
-            key_id = os.environ.get('KEY_ID_PRIVATE')
-            application_key = os.environ.get('APPLICATION_KEY_PRIVATE')
-            bucket_id = os.environ.get('BUCKET_ID')
-
-            if key_id and application_key and bucket_id:
-                # Step 1: Authenticate and get authorization token
-                auth_string = f"{key_id}:{application_key}"
-                auth_encoded = base64.b64encode(auth_string.encode()).decode()
-
-                auth_response = requests.get(
-                    "https://api.backblazeb2.com/b2api/v2/b2_authorize_account",
-                    headers={"Authorization": f"Basic {auth_encoded}"}
-                )
-
-                if auth_response.status_code != 200:
-                    logger.error(f"B2 authentication failed: {auth_response.text}")
-                    return
-
-                auth_data = auth_response.json()
-                auth_token = auth_data['authorizationToken']
-                api_url = auth_data['apiUrl']
-                download_url = auth_data['downloadUrl']
-
-                # Step 2: Get upload URL
-                get_upload_url_response = requests.get(
-                    f"{api_url}/b2api/v2/b2_get_upload_url",
-                    headers={
-                        "Authorization": auth_token
-                    },
-                    params={"bucketId": bucket_id}
-                )
-
-                if get_upload_url_response.status_code != 200:
-                    logger.error(f"Failed to get upload URL: {get_upload_url_response.text}")
-                    return
-
-                upload_data = get_upload_url_response.json()
-                upload_url = upload_data['uploadUrl']
-                upload_auth_token = upload_data['authorizationToken']
-
-                # Step 3: Upload the file
-                backup_filename = os.path.basename(dest_file)
-                logger.info(f"Uploading {backup_filename} to B2 bucket {bucket_id}")
-
-                with open(dest_file, 'rb') as file:
-                    file_data = file.read()
-
-                # Calculate SHA1 hash
-                sha1_hash = hashlib.sha1(file_data).hexdigest()
-
-                upload_response = requests.post(
-                    upload_url,
-                    headers={
-                        "Authorization": upload_auth_token,
-                        "X-Bz-File-Name": backup_filename,
-                        "Content-Type": "application/octet-stream",
-                        "X-Bz-Content-Sha1": sha1_hash
-                    },
-                    data=file_data
-                )
-
-                if upload_response.status_code == 200:
-                    logger.info("Upload to B2 completed successfully")
-                else:
-                    logger.error(f"Upload failed: {upload_response.text}")
-            else:
-                logger.warning("B2 credentials not found in environment variables. Skipping upload.")
-        except Exception as e:
-            logger.error("Error uploading to B2: {}".format(str(e)))
+        # Upload the backup file to Backblaze B2
+        upload_to_b2(dest_file)
