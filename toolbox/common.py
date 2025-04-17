@@ -4,6 +4,8 @@ import datetime
 import shutil
 
 import pandas as pd
+import boto3
+from dotenv import load_dotenv
 from loguru import logger
 from .models import ImportHeader
 from django.conf import settings
@@ -140,6 +142,9 @@ def do_import(df):
     return df_duplicates, df_imported
 
 def do_cleanup():
+    # Load environment variables from .env file
+    load_dotenv()
+
     source_dir = os.path.join(settings.BASE_DIR, 'temp')
     list_of_files = glob.glob(os.path.join(source_dir, '*.csv'))
     list_of_files += glob.glob(os.path.join(source_dir, '*.json'))
@@ -162,3 +167,34 @@ def do_cleanup():
         dest_file = this_file.replace('db.sqlite3', 'BACKUPS/db' + date_to_save + '.sqlite3')
         logger.info("Copying {} to {}".format(this_file, dest_file))
         shutil.copyfile(this_file, dest_file)
+
+        # Upload the backup file to Backblaze B2
+        try:
+            # Get B2 credentials from environment variables
+            endpoint = os.environ.get('ENDPOINT')
+            key_id = os.environ.get('KEY_ID_PRIVATE')
+            application_key = os.environ.get('APPLICATION_KEY_PRIVATE')
+            bucket_name = os.environ.get('BUCKET_NAME')
+
+            if endpoint and key_id and application_key and bucket_name:
+                # Create a session with Backblaze B2
+                session = boto3.session.Session()
+                s3 = session.resource(
+                    service_name='s3',
+                    endpoint_url=endpoint,
+                    aws_access_key_id=key_id,
+                    aws_secret_access_key=application_key
+                )
+
+                # Upload the file to B2
+                backup_filename = os.path.basename(dest_file)
+                logger.info("Uploading {} to B2 bucket {}".format(backup_filename, bucket_name))
+                s3.Bucket(bucket_name).upload_file(
+                    Filename=dest_file,
+                    Key=backup_filename
+                )
+                logger.info("Upload to B2 completed successfully")
+            else:
+                logger.warning("B2 credentials not found in environment variables. Skipping upload.")
+        except Exception as e:
+            logger.error("Error uploading to B2: {}".format(str(e)))
