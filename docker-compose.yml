@@ -1,8 +1,8 @@
-version: "3"
+# version: "3"
 
 services:
   kontakt:
-    container_name: konta-kt-20250406
+    container_name: konta-kt-20250417
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
