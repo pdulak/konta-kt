@@ -5,6 +5,7 @@ import shutil
 
 import pandas as pd
 import boto3
+from botocore.config import Config
 from dotenv import load_dotenv
 from loguru import logger
 from .models import ImportHeader
@@ -183,7 +184,10 @@ def do_cleanup():
                     service_name='s3',
                     endpoint_url=endpoint,
                     aws_access_key_id=key_id,
-                    aws_secret_access_key=application_key
+                    aws_secret_access_key=application_key,
+                    config=Config(
+                        signature_version='s3v4',
+                    )
                 )
 
                 # Upload the file to B2
