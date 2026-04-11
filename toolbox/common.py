@@ -235,32 +235,53 @@ def upload_to_b2(file_path, bucket_id=None):
         return False
 
 
+def ping_healthcheck(suffix=""):
+    """Notify a Healthchecks-compatible server. suffix: '' = success, '/start', '/fail'."""
+    base = os.environ.get("HEALTHCHECKS_PING_URL", "").strip()
+    if not base:
+        return
+    url = base.rstrip("/") + suffix
+    try:
+        requests.get(url, timeout=15)
+        logger.info("Healthcheck ping to {} completed successfully".format(url))
+    except Exception as e:
+        logger.warning("Healthcheck ping to {} failed: {}", url, e)
+
+
 def do_cleanup():
     # Load environment variables from .env file
     load_dotenv()
 
-    source_dir = os.path.join(settings.BASE_DIR, 'temp')
-    list_of_files = glob.glob(os.path.join(source_dir, '*.csv'))
-    list_of_files += glob.glob(os.path.join(source_dir, '*.json'))
-    for this_file in list_of_files:
-        logger.info("Removing {}".format(this_file))
-        os.remove(this_file)
+    ping_healthcheck("/start")
 
-    source_dir = os.path.join(settings.BASE_DIR, 'temp', 'alior')
-    list_of_files = glob.glob(os.path.join(source_dir, '*.csv'))
-    list_of_files += glob.glob(os.path.join(source_dir, '*.CSV'))
-    for this_file in list_of_files:
-        logger.info("Removing {}".format(this_file))
-        os.remove(this_file)
+    try:
+        source_dir = os.path.join(settings.BASE_DIR, 'temp')
+        list_of_files = glob.glob(os.path.join(source_dir, '*.csv'))
+        list_of_files += glob.glob(os.path.join(source_dir, '*.json'))
+        for this_file in list_of_files:
+            logger.info("Removing {}".format(this_file))
+            os.remove(this_file)
 
-    source_dir = settings.BASE_DIR
-    destination_dir = os.path.join(settings.BASE_DIR, 'BACKUPS')
-    list_of_files = glob.glob(os.path.join(source_dir, 'db.sqlite3'))
-    for this_file in list_of_files:
-        date_to_save = datetime.datetime.now().strftime("-%Y%m%d-%H%M%S")
-        dest_file = this_file.replace('db.sqlite3', 'BACKUPS/db' + date_to_save + '.sqlite3')
-        logger.info("Copying {} to {}".format(this_file, dest_file))
-        shutil.copyfile(this_file, dest_file)
+        source_dir = os.path.join(settings.BASE_DIR, 'temp', 'alior')
+        list_of_files = glob.glob(os.path.join(source_dir, '*.csv'))
+        list_of_files += glob.glob(os.path.join(source_dir, '*.CSV'))
+        for this_file in list_of_files:
+            logger.info("Removing {}".format(this_file))
+            os.remove(this_file)
 
-        # Upload the backup file to Backblaze B2
-        upload_to_b2(dest_file)
+        source_dir = settings.BASE_DIR
+        list_of_files = glob.glob(os.path.join(source_dir, 'db.sqlite3'))
+        for this_file in list_of_files:
+            date_to_save = datetime.datetime.now().strftime("-%Y%m%d-%H%M%S")
+            dest_file = this_file.replace('db.sqlite3', 'BACKUPS/db' + date_to_save + '.sqlite3')
+            logger.info("Copying {} to {}".format(this_file, dest_file))
+            shutil.copyfile(this_file, dest_file)
+
+            if not upload_to_b2(dest_file):
+                ping_healthcheck("/fail")
+                return
+
+        ping_healthcheck("")
+    except Exception:
+        ping_healthcheck("/fail")
+        raise
