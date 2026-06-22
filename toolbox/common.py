@@ -281,6 +281,12 @@ def do_cleanup():
                 ping_healthcheck("/fail")
                 return
 
+        backups_dir = os.path.join(settings.BASE_DIR, 'BACKUPS')
+        backup_files = sorted(glob.glob(os.path.join(backups_dir, 'db*.sqlite3')), key=os.path.getmtime, reverse=True)
+        for old_backup in backup_files[10:]:
+            logger.info("Removing old backup: {}".format(old_backup))
+            os.remove(old_backup)
+
         ping_healthcheck("")
     except Exception:
         ping_healthcheck("/fail")
