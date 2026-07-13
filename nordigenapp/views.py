@@ -164,7 +164,10 @@ def convert_transactions_to_dataframe(account_id, account_number, transactions):
 
             party_iban = ''
             if 'creditorAccount' in boo.keys():
-                party_iban = boo['creditorAccount']['iban']
+                if 'iban' in boo['creditorAccount']:
+                    party_iban = boo['creditorAccount']['iban']
+                elif 'bban' in boo['creditorAccount']:
+                    party_iban = boo['creditorAccount']['bban']
 
         else:
             party_name = ''
@@ -177,7 +180,10 @@ def convert_transactions_to_dataframe(account_id, account_number, transactions):
 
             party_iban = ''
             if 'debtorAccount' in boo.keys():
-                party_iban = boo['debtorAccount']['iban']
+                if 'iban' in boo['debtorAccount']:
+                    party_iban = boo['debtorAccount']['iban']
+                elif 'bban' in boo['debtorAccount']:
+                    party_iban = boo['debtorAccount']['bban']
 
         transaction_type = 'OUT' if boo['transactionAmount']['amount'] <= 0 else 'IN'
         if 'proprietaryBankTransactionCode' in boo.keys():
